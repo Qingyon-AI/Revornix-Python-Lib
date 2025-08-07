@@ -66,3 +66,7 @@ def test_create_section():
 def test_get_mine_all_document_labels():
     res = session.get_mine_all_document_labels()
     assert res is not None
+    
+def test_get_mine_all_sections():
+    res = session.get_mine_all_sections()
+    assert res is not None

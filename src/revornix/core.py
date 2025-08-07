@@ -66,3 +66,8 @@ class Session:
         response = self.httpx_client.post(SectionApi.create_section, json=data.model_dump())
         response.raise_for_status()
         return sectionSchema.SectionCreateResponse.model_validate(response.json())
+    
+    def get_mine_all_sections(self) -> sectionSchema.AllMySectionsResponse:
+        response = self.httpx_client.post(SectionApi.get_mine_all_section)
+        response.raise_for_status()
+        return sectionSchema.AllMySectionsResponse.model_validate(response.json())
