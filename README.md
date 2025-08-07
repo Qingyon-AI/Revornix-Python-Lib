@@ -50,6 +50,22 @@ data = section_schame.LabelAddRequest(
 res = session.create_section_label(data=data)
 ```
 
+### Create Section
+
+```python
+from revornix import Session
+
+session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
+data = section_schame.SectionCreateRequest(
+    title="test",
+    description="test",
+    public=False,
+    cover_id=1,
+    labels=[]
+)
+res = session.create_section(data=data)
+```
+
 ### Get Mine All Document Labels
 
 ```python

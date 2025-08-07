@@ -51,6 +51,17 @@ def test_create_section_label():
     )
     res = session.create_section_label(data=data)
     assert res is not None
+    
+def test_create_section():
+    data = section_schame.SectionCreateRequest(
+        title="test",
+        description="test",
+        public=False,
+        cover_id=1,
+        labels=[]
+    )
+    res = session.create_section(data=data)
+    assert res is not None
 
 def test_get_mine_all_document_labels():
     res = session.get_mine_all_document_labels()

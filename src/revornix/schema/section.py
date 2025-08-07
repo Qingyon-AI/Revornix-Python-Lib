@@ -10,3 +10,13 @@ class BaseSectionInfo(BaseModel):
         
 class AllMySectionsResponse(BaseModel):
     data: list[BaseSectionInfo]
+    
+class SectionCreateRequest(BaseModel):
+    title: str
+    description: str
+    public: bool
+    cover_id: int | None = None
+    labels: list[int]
+    
+class SectionCreateResponse(BaseModel):
+    id: int

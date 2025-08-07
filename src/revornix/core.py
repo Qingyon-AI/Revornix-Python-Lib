@@ -1,7 +1,8 @@
 import httpx
 from revornix.api.document import DocumentApi
 from revornix.api.section import SectionApi
-from revornix.schema.document import FileDocumentParameters, WebsiteDocumentParameters, QuickNoteDocumentParameters, DocumentCreateResponse, CreateLabelResponse, LabelAddRequest, LabelListResponse
+import revornix.schema.document as documentSchema
+import revornix.schema.section as sectionSchema
 
 class Session:
     
@@ -22,41 +23,46 @@ class Session:
             timeout=15.0
         )
         
-    def create_file_document(self, data: FileDocumentParameters) -> DocumentCreateResponse:
+    def create_file_document(self, data: documentSchema.FileDocumentParameters) -> documentSchema.DocumentCreateResponse:
         payload = data.model_dump()
         payload["category"] = 0
         payload["from_plat"] = self.from_plat
         response = self.httpx_client.post(DocumentApi.create_document, json=payload)
         response.raise_for_status()
-        return DocumentCreateResponse.model_validate(response.json())
+        return documentSchema.DocumentCreateResponse.model_validate(response.json())
 
-    def create_website_document(self, data: WebsiteDocumentParameters) -> DocumentCreateResponse:
+    def create_website_document(self, data: documentSchema.WebsiteDocumentParameters) -> documentSchema.DocumentCreateResponse:
         payload = data.model_dump()
         payload["category"] = 1
         payload["from_plat"] = self.from_plat
         response = self.httpx_client.post(DocumentApi.create_document, json=payload)
         response.raise_for_status()
-        return DocumentCreateResponse.model_validate(response.json())
+        return documentSchema.DocumentCreateResponse.model_validate(response.json())
 
-    def create_quick_note_document(self, data: QuickNoteDocumentParameters) -> DocumentCreateResponse:
+    def create_quick_note_document(self, data: documentSchema.QuickNoteDocumentParameters) -> documentSchema.DocumentCreateResponse:
         payload = data.model_dump()
         payload["category"] = 2
         payload["from_plat"] = self.from_plat
         response = self.httpx_client.post(DocumentApi.create_document, json=payload)
         response.raise_for_status()
-        return DocumentCreateResponse.model_validate(response.json())
+        return documentSchema.DocumentCreateResponse.model_validate(response.json())
 
-    def get_mine_all_document_labels(self) -> LabelListResponse:
+    def get_mine_all_document_labels(self) -> documentSchema.LabelListResponse:
         response = self.httpx_client.post(DocumentApi.get_mine_all_document_labels)
         response.raise_for_status()
-        return LabelListResponse.model_validate(response.json())
+        return documentSchema.LabelListResponse.model_validate(response.json())
 
-    def create_document_label(self, data: LabelAddRequest) -> CreateLabelResponse:
+    def create_document_label(self, data: documentSchema.LabelAddRequest) -> documentSchema.CreateLabelResponse:
         response = self.httpx_client.post(DocumentApi.create_document_label, json=data.model_dump())
         response.raise_for_status()
-        return CreateLabelResponse.model_validate(response.json())
+        return documentSchema.CreateLabelResponse.model_validate(response.json())
 
-    def create_section_label(self, data: LabelAddRequest) -> CreateLabelResponse:
+    def create_section_label(self, data: documentSchema.LabelAddRequest) -> documentSchema.CreateLabelResponse:
         response = self.httpx_client.post(SectionApi.create_section_label, json=data.model_dump())
         response.raise_for_status()
-        return CreateLabelResponse.model_validate(response.json())
+        return documentSchema.CreateLabelResponse.model_validate(response.json())
+    
+    def create_section(self, data: sectionSchema.SectionCreateRequest) -> sectionSchema.SectionCreateResponse:
+        response = self.httpx_client.post(SectionApi.create_section, json=data.model_dump())
+        response.raise_for_status()
+        return sectionSchema.SectionCreateResponse.model_validate(response.json())
