@@ -29,10 +29,10 @@ pip install revornix
 ### Create Document Label
 
 ```python
-from revornix import Session
+from revornix import Session, Schema
 
 session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
-data = document_schema.LabelAddRequest(
+data = Schema.DocumentSchema.LabelAddRequest(
     name="test"
 )
 res = session.create_document_label(data=data)
@@ -41,10 +41,10 @@ res = session.create_document_label(data=data)
 ### Create Section Label
 
 ```python
-from revornix import Session
+from revornix import Session, Schema
 
 session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
-data = section_schame.LabelAddRequest(
+data = Schema.SectionSchema.LabelAddRequest(
     name="test"
 )
 res = session.create_section_label(data=data)
@@ -53,10 +53,10 @@ res = session.create_section_label(data=data)
 ### Create Section
 
 ```python
-from revornix import Session
+from revornix import Session, Schema
 
 session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
-data = section_schame.SectionCreateRequest(
+data = Schema.SectionSchema.SectionCreateRequest(
     title="test",
     description="test",
     public=False,
@@ -78,10 +78,10 @@ res = session.get_mine_all_document_labels()
 ### Create Quick Note Document
 
 ```python
-from revornix import Session
+from revornix import Session, Schema
 
 session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
-data = document_schema.QuickNoteDocumentParameters(
+data = Schema.DocumentSchema.QuickNoteDocumentParameters(
     content="test",
     sections=[],
     auto_summary=False
@@ -92,10 +92,10 @@ res = session.create_quick_note_document(data=data)
 ### Create Website Document
 
 ```python
-from revornix import Session
+from revornix import Session, Schema
 
 session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
-data = document_schema.WebsiteDocumentParameters(
+data = Schema.DocumentSchema.WebsiteDocumentParameters(
     url="https://www.google.com",
     sections=[],
     auto_summary=False
@@ -106,10 +106,10 @@ res = session.create_website_document(data=data)
 ### Create File Document
 
 ```python
-from revornix import Session
+from revornix import Session, Schema
 
 session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
-data = document_schema.FileDocumentParameters(
+data = Schema.DocumentSchema.FileDocumentParameters(
     file_name="demo",
     sections=[],
     auto_summary=False

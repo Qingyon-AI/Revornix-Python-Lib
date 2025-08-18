@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
-import revornix.schema.document as document_schema
-import revornix.schema.section as section_schame
+import revornix.schema.document as DocumentSchema
+import revornix.schema.section as SectionSchema
 from revornix.core import Session
 
 base_url = os.environ.get('REVORNIX_URL_PREFIX')
@@ -12,7 +12,7 @@ api_key = os.environ.get('API_KEY')
 session = Session(base_url=base_url, api_key=api_key)
     
 def test_create_file_document():
-    data = document_schema.FileDocumentParameters(
+    data = DocumentSchema.FileDocumentParameters(
         file_name="demo",
         sections=[],
         auto_summary=False
@@ -21,7 +21,7 @@ def test_create_file_document():
     assert res is not None
     
 def test_create_website_document():
-    data = document_schema.WebsiteDocumentParameters(
+    data = DocumentSchema.WebsiteDocumentParameters(
         url="https://www.google.com",
         sections=[],
         auto_summary=False
@@ -30,7 +30,7 @@ def test_create_website_document():
     assert res is not None
     
 def test_create_quick_note_document():
-    data = document_schema.QuickNoteDocumentParameters(
+    data = DocumentSchema.QuickNoteDocumentParameters(
         content="test",
         sections=[],
         auto_summary=False
@@ -39,21 +39,21 @@ def test_create_quick_note_document():
     assert res is not None
     
 def test_create_document_label():
-    data = document_schema.LabelAddRequest(
+    data = DocumentSchema.LabelAddRequest(
         name="test"
     )
     res = session.create_document_label(data=data)
     assert res is not None
     
 def test_create_section_label():
-    data = section_schame.LabelAddRequest(
+    data = SectionSchema.LabelAddRequest(
         name="test"
     )
     res = session.create_section_label(data=data)
     assert res is not None
     
 def test_create_section():
-    data = section_schame.SectionCreateRequest(
+    data = SectionSchema.SectionCreateRequest(
         title="test",
         description="test",
         public=False,

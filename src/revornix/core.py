@@ -1,8 +1,8 @@
 import httpx
 from revornix.api.document import DocumentApi
 from revornix.api.section import SectionApi
-import revornix.schema.document as documentSchema
-import revornix.schema.section as sectionSchema
+import revornix.schema.document as DocumentSchema
+import revornix.schema.section as SectionSchema
 
 class Session:
     
@@ -23,51 +23,51 @@ class Session:
             timeout=15.0
         )
         
-    def create_file_document(self, data: documentSchema.FileDocumentParameters) -> documentSchema.DocumentCreateResponse:
+    def create_file_document(self, data: DocumentSchema.FileDocumentParameters) -> DocumentSchema.DocumentCreateResponse:
         payload = data.model_dump()
         payload["category"] = 0
         payload["from_plat"] = self.from_plat
         response = self.httpx_client.post(DocumentApi.create_document, json=payload)
         response.raise_for_status()
-        return documentSchema.DocumentCreateResponse.model_validate(response.json())
+        return DocumentSchema.DocumentCreateResponse.model_validate(response.json())
 
-    def create_website_document(self, data: documentSchema.WebsiteDocumentParameters) -> documentSchema.DocumentCreateResponse:
+    def create_website_document(self, data: DocumentSchema.WebsiteDocumentParameters) -> DocumentSchema.DocumentCreateResponse:
         payload = data.model_dump()
         payload["category"] = 1
         payload["from_plat"] = self.from_plat
         response = self.httpx_client.post(DocumentApi.create_document, json=payload)
         response.raise_for_status()
-        return documentSchema.DocumentCreateResponse.model_validate(response.json())
+        return DocumentSchema.DocumentCreateResponse.model_validate(response.json())
 
-    def create_quick_note_document(self, data: documentSchema.QuickNoteDocumentParameters) -> documentSchema.DocumentCreateResponse:
+    def create_quick_note_document(self, data: DocumentSchema.QuickNoteDocumentParameters) -> DocumentSchema.DocumentCreateResponse:
         payload = data.model_dump()
         payload["category"] = 2
         payload["from_plat"] = self.from_plat
         response = self.httpx_client.post(DocumentApi.create_document, json=payload)
         response.raise_for_status()
-        return documentSchema.DocumentCreateResponse.model_validate(response.json())
+        return DocumentSchema.DocumentCreateResponse.model_validate(response.json())
 
-    def get_mine_all_document_labels(self) -> documentSchema.LabelListResponse:
+    def get_mine_all_document_labels(self) -> DocumentSchema.LabelListResponse:
         response = self.httpx_client.post(DocumentApi.get_mine_all_document_labels)
         response.raise_for_status()
-        return documentSchema.LabelListResponse.model_validate(response.json())
+        return DocumentSchema.LabelListResponse.model_validate(response.json())
 
-    def create_document_label(self, data: documentSchema.LabelAddRequest) -> documentSchema.CreateLabelResponse:
+    def create_document_label(self, data: DocumentSchema.LabelAddRequest) -> DocumentSchema.CreateLabelResponse:
         response = self.httpx_client.post(DocumentApi.create_document_label, json=data.model_dump())
         response.raise_for_status()
-        return documentSchema.CreateLabelResponse.model_validate(response.json())
+        return DocumentSchema.CreateLabelResponse.model_validate(response.json())
 
-    def create_section_label(self, data: documentSchema.LabelAddRequest) -> documentSchema.CreateLabelResponse:
+    def create_section_label(self, data: DocumentSchema.LabelAddRequest) -> DocumentSchema.CreateLabelResponse:
         response = self.httpx_client.post(SectionApi.create_section_label, json=data.model_dump())
         response.raise_for_status()
-        return documentSchema.CreateLabelResponse.model_validate(response.json())
+        return DocumentSchema.CreateLabelResponse.model_validate(response.json())
     
-    def create_section(self, data: sectionSchema.SectionCreateRequest) -> sectionSchema.SectionCreateResponse:
+    def create_section(self, data: SectionSchema.SectionCreateRequest) -> SectionSchema.SectionCreateResponse:
         response = self.httpx_client.post(SectionApi.create_section, json=data.model_dump())
         response.raise_for_status()
-        return sectionSchema.SectionCreateResponse.model_validate(response.json())
+        return SectionSchema.SectionCreateResponse.model_validate(response.json())
     
-    def get_mine_all_sections(self) -> sectionSchema.AllMySectionsResponse:
+    def get_mine_all_sections(self) -> SectionSchema.AllMySectionsResponse:
         response = self.httpx_client.post(SectionApi.get_mine_all_section)
         response.raise_for_status()
-        return sectionSchema.AllMySectionsResponse.model_validate(response.json())
+        return SectionSchema.AllMySectionsResponse.model_validate(response.json())

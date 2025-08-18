@@ -18,7 +18,7 @@ class SectionCreateRequest(BaseModel):
     title: str
     description: str
     public: bool
-    cover_id: int | None = None
+    cover: str | None = None
     labels: list[int]
     
 class SectionCreateResponse(BaseModel):
