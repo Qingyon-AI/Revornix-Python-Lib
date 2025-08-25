@@ -11,6 +11,10 @@ api_key = os.environ.get('API_KEY')
 
 session = Session(base_url=base_url, api_key=api_key)
     
+def test_upload_file():
+    res = session.upload_file(local_file_path="./tests/test.txt", remote_file_path="test.txt")
+    assert res is not None
+    
 def test_create_file_document():
     data = DocumentSchema.FileDocumentParameters(
         file_name="demo",

@@ -26,6 +26,15 @@ pip install revornix
 
 ## Usage
 
+### Upload File
+
+```python
+from revornix import Session
+
+session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
+res = session.upload_file(local_file_path="", remote_file_path="")
+```
+
 ### Create Document Label
 
 ```python

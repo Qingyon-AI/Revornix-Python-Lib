@@ -1,8 +1,11 @@
 import httpx
+from pathlib import Path
 from revornix.api.document import DocumentApi
 from revornix.api.section import SectionApi
+from revornix.api.file import FileApi
 import revornix.schema.document as DocumentSchema
 import revornix.schema.section as SectionSchema
+import revornix.schema.common as CommonSchema
 
 class Session:
     
@@ -17,11 +20,24 @@ class Session:
         self.httpx_client = httpx.Client(
             base_url=self.base_url,
             headers={
-                "Api-Key": self.api_key,
-                "Content-Type": "application/json"
+                "Api-Key": self.api_key
             },
             timeout=15.0
         )
+        
+    def upload_file(self, local_file_path: str, remote_file_path: str, content_type: str | None = "application/octet-stream") -> CommonSchema.NormalResponse:
+        with open(local_file_path, "rb") as f:
+            files = {
+                "file": (Path(local_file_path).name, f, content_type)
+            }
+            data = {
+                "file_path": remote_file_path,
+                "content_type": content_type
+            }
+            response = self.httpx_client.post(FileApi.upload_file, files=files, data=data)
+            response.raise_for_status()
+        return CommonSchema.SuccessResponse.model_validate(response.json())
+
         
     def create_file_document(self, data: DocumentSchema.FileDocumentParameters) -> DocumentSchema.DocumentCreateResponse:
         payload = data.model_dump()
