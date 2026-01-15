@@ -68,9 +68,10 @@ session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
 data = Schema.SectionSchema.SectionCreateRequest(
     title="test",
     description="test",
-    public=False,
-    cover_id=1,
-    labels=[]
+    auto_publish=False,
+    cover='test.png',
+    labels=[],
+    process_task_trigger_type=1
 )
 res = session.create_section(data=data)
 ```
@@ -93,6 +94,7 @@ session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
 data = Schema.DocumentSchema.QuickNoteDocumentParameters(
     content="test",
     sections=[],
+    labels=[],
     auto_summary=False
 )
 res = session.create_quick_note_document(data=data)
@@ -107,6 +109,7 @@ session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
 data = Schema.DocumentSchema.WebsiteDocumentParameters(
     url="https://www.google.com",
     sections=[],
+    labels=[],
     auto_summary=False
 )
 res = session.create_website_document(data=data)
@@ -121,6 +124,7 @@ session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
 data = Schema.DocumentSchema.FileDocumentParameters(
     file_name="demo",
     sections=[],
+    labels=[],
     auto_summary=False
 )
 res = session.create_file_document(data=data)

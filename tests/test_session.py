@@ -19,6 +19,7 @@ def test_create_file_document():
     data = DocumentSchema.FileDocumentParameters(
         file_name="demo",
         sections=[],
+        labels=[],
         auto_summary=False
     )
     res = session.create_file_document(data=data)
@@ -28,6 +29,7 @@ def test_create_website_document():
     data = DocumentSchema.WebsiteDocumentParameters(
         url="https://www.google.com",
         sections=[],
+        labels=[],
         auto_summary=False
     )
     res = session.create_website_document(data=data)
@@ -37,6 +39,7 @@ def test_create_quick_note_document():
     data = DocumentSchema.QuickNoteDocumentParameters(
         content="test",
         sections=[],
+        labels=[],
         auto_summary=False
     )
     res = session.create_quick_note_document(data=data)
@@ -60,9 +63,10 @@ def test_create_section():
     data = SectionSchema.SectionCreateRequest(
         title="test",
         description="test",
-        public=False,
-        cover_id=1,
-        labels=[]
+        auto_publish=False,
+        cover='test.png',
+        labels=[],
+        process_task_trigger_type=1
     )
     res = session.create_section(data=data)
     assert res is not None
