@@ -130,6 +130,23 @@ data = Schema.DocumentSchema.FileDocumentParameters(
 res = session.create_file_document(data=data)
 ```
 
+### Create Audio Document
+
+```python
+from revornix import Session, Schema
+
+session = Session(base_url='YOUR_API_PREFIX', api_key='YOUR_API_KEY');
+data = Schema.DocumentSchema.AudioDocumentParameters(
+    file_name="demo.mp3",
+    sections=[],
+    labels=[],
+    auto_summary=False,
+    auto_transcribe=True
+)
+res = session.create_audio_document(data=data)
+```
+
+
 ## Contributors
 
 <a href="https://github.com/Qingyon-AI/Revornx/graphs/contributors">

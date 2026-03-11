@@ -61,4 +61,5 @@ class AudioDocumentParameters(BaseModel):
     file_name: str | None = None
     auto_summary: bool = False
     auto_podcast: bool = False
+    auto_transcribe: bool = False
     auto_tag: bool = False
