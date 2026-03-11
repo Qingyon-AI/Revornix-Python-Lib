@@ -62,6 +62,14 @@ class Session:
         response = self.httpx_client.post(DocumentApi.create_document, json=payload)
         response.raise_for_status()
         return DocumentSchema.DocumentCreateResponse.model_validate(response.json())
+    
+    def create_audio_document(self, data: DocumentSchema.AudioDocumentParameters) -> DocumentSchema.DocumentCreateResponse:
+        payload = data.model_dump()
+        payload["category"] = 3
+        payload["from_plat"] = self.from_plat
+        response = self.httpx_client.post(DocumentApi.create_document, json=payload)
+        response.raise_for_status()
+        return DocumentSchema.DocumentCreateResponse.model_validate(response.json())
 
     def get_mine_all_document_labels(self) -> DocumentSchema.LabelListResponse:
         response = self.httpx_client.post(DocumentApi.get_mine_all_document_labels)

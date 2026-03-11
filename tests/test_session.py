@@ -10,9 +10,13 @@ base_url = os.environ.get('REVORNIX_URL_PREFIX')
 api_key = os.environ.get('API_KEY')
 
 session = Session(base_url=base_url, api_key=api_key)
-    
-def test_upload_file():
+
+def test_upload_text_file():
     res = session.upload_file(local_file_path="./tests/test.txt", remote_file_path="test.txt")
+    assert res is not None
+
+def test_upload_mp3_file():
+    res = session.upload_file(local_file_path="./tests/test.mp3", remote_file_path="test.mp3")
     assert res is not None
     
 def test_create_file_document():
@@ -23,6 +27,16 @@ def test_create_file_document():
         auto_summary=False
     )
     res = session.create_file_document(data=data)
+    assert res is not None
+
+def test_create_audio_document():
+    data = DocumentSchema.AudioDocumentParameters(
+        file_name="test.mp3",
+        sections=[],
+        labels=[],
+        auto_summary=False
+    )
+    res = session.create_audio_document(data=data)
     assert res is not None
     
 def test_create_website_document():

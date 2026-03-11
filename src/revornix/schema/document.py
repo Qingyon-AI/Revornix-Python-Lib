@@ -50,3 +50,15 @@ class QuickNoteDocumentParameters(BaseModel):
     auto_summary: bool = False
     auto_podcast: bool = False
     auto_tag: bool = False
+
+
+class AudioDocumentParameters(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    cover: str | None = None
+    sections: list[int]
+    labels: list[int]
+    file_name: str | None = None
+    auto_summary: bool = False
+    auto_podcast: bool = False
+    auto_tag: bool = False
