@@ -1,6 +1,6 @@
 [project]
 name = "revornix"
-version = "0.0.9"
+version = "0.1.0"
 description = "The python package for Revornix API."
 authors = [
     { name = "Kinda Hall", email = "1142704468@qq.com" }
@@ -10,8 +10,12 @@ requires-python = ">=3.10"
 license-files = ["LICENSE"]
 dependencies = [
   "httpx",
-  "pydantic>=2.0"
+  "pydantic>=2.0",
+  "typer>=0.12"
 ]
+
+[project.scripts]
+revornix = "revornix.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/Qingyon-AI/Revornix-Python-Lib"
