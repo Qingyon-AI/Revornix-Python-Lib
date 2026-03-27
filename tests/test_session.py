@@ -1,13 +1,29 @@
 import os
+
+import pytest
 from dotenv import load_dotenv
+
 load_dotenv(override=True)
 
 import revornix.schema.document as DocumentSchema
 import revornix.schema.section as SectionSchema
 from revornix.core import Session
 
-base_url = os.environ.get('REVORNIX_URL_PREFIX')
-api_key = os.environ.get('API_KEY')
+
+def _required_env(*names: str) -> str:
+    for name in names:
+        value = os.environ.get(name)
+        if value:
+            return value
+    pytest.skip(
+        f"missing required environment variables: {', '.join(names)}",
+        allow_module_level=True,
+    )
+    raise AssertionError("unreachable")
+
+
+base_url = _required_env("REVORNIX_BASE_URL", "REVORNIX_URL_PREFIX")
+api_key = _required_env("REVORNIX_API_KEY", "API_KEY")
 
 session = Session(base_url=base_url, api_key=api_key)
 

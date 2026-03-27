@@ -34,3 +34,35 @@ def create_section_label(
     session = session_from_context(ctx)
     payload = SectionSchema.LabelAddRequest(name=name)
     handle_api_call(lambda: session.create_section_label(payload))
+
+
+@app.command("list-section")
+def list_section_labels(ctx: typer.Context) -> None:
+    session = session_from_context(ctx)
+    handle_api_call(session.get_mine_all_section_labels)
+
+
+@app.command("delete-document")
+def delete_document_label(
+    ctx: typer.Context,
+    label_ids: Annotated[
+        list[int],
+        typer.Option("--label-id", help="Document label id. Repeat the option for multiple values."),
+    ],
+) -> None:
+    session = session_from_context(ctx)
+    payload = DocumentSchema.LabelDeleteRequest(label_ids=list(label_ids))
+    handle_api_call(lambda: session.delete_document_label(payload))
+
+
+@app.command("delete-section")
+def delete_section_label(
+    ctx: typer.Context,
+    label_ids: Annotated[
+        list[int],
+        typer.Option("--label-id", help="Section label id. Repeat the option for multiple values."),
+    ],
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.LabelDeleteRequest(label_ids=list(label_ids))
+    handle_api_call(lambda: session.delete_section_label(payload))

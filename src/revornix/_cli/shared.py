@@ -57,3 +57,24 @@ def session_from_context(ctx: typer.Context) -> Session:
 
 def normalize_ids(values: list[int] | None) -> list[int]:
     return list(values or [])
+
+
+def optional_ids(values: list[int] | None) -> list[int] | None:
+    if values is None:
+        return None
+    return list(values)
+
+
+def parse_bool(value: str) -> bool:
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise typer.BadParameter("Expected a boolean value: true or false.")
+
+
+def parse_optional_bool(value: str | None) -> bool | None:
+    if value is None:
+        return None
+    return parse_bool(value)

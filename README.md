@@ -150,6 +150,18 @@ List all sections:
 revornix sections list
 ```
 
+Get document detail:
+
+```shell
+revornix documents detail --document-id 123
+```
+
+Search my documents:
+
+```shell
+revornix documents search-mine --keyword notes --label 10 --desc true
+```
+
 Create a section:
 
 ```shell
@@ -159,6 +171,18 @@ revornix sections create \
   --process-task-trigger-type 1 \
   --label 10 \
   --auto-publish
+```
+
+Get section detail:
+
+```shell
+revornix sections detail --section-id 12
+```
+
+Publish a section:
+
+```shell
+revornix sections publish --section-id 12 --status true
 ```
 
 ### CLI Command Reference
@@ -221,6 +245,33 @@ revornix documents create-audio \
   --auto-summary
 ```
 
+Get document detail:
+
+```shell
+revornix documents detail --document-id 123
+```
+
+Update document metadata:
+
+```shell
+revornix documents update \
+  --document-id 123 \
+  --title "Updated Title" \
+  --section 1 \
+  --label 10
+```
+
+Search my documents:
+
+```shell
+revornix documents search-mine \
+  --keyword notes \
+  --label 10 \
+  --start 0 \
+  --limit 20 \
+  --desc true
+```
+
 #### `labels`
 
 List document labels:
@@ -241,6 +292,24 @@ Create a section label:
 revornix labels create-section --name collection
 ```
 
+List section labels:
+
+```shell
+revornix labels list-section
+```
+
+Delete document labels:
+
+```shell
+revornix labels delete-document --label-id 10 --label-id 11
+```
+
+Delete section labels:
+
+```shell
+revornix labels delete-section --label-id 20 --label-id 21
+```
+
 #### `sections`
 
 List sections:
@@ -258,6 +327,53 @@ revornix sections create \
   --process-task-trigger-type 1 \
   --process-task-trigger-scheduler "0 0 * * 1" \
   --label 10
+```
+
+Get section detail:
+
+```shell
+revornix sections detail --section-id 12
+```
+
+List section documents:
+
+```shell
+revornix sections documents --section-id 12 --start 0 --limit 20 --desc true
+```
+
+Search my sections:
+
+```shell
+revornix sections search-mine --keyword digest --label 10 --desc true
+```
+
+Update a section:
+
+```shell
+revornix sections update \
+  --section-id 12 \
+  --title "Weekly Digest" \
+  --auto-podcast true \
+  --auto-illustration false
+```
+
+Get publish status:
+
+```shell
+revornix sections get-publish --section-id 12
+```
+
+Publish or unpublish:
+
+```shell
+revornix sections publish --section-id 12 --status true
+revornix sections publish --section-id 12 --status false
+```
+
+Republish:
+
+```shell
+revornix sections republish --section-id 12
 ```
 
 ### CLI Notes
@@ -511,9 +627,22 @@ The current `Session` methods are:
 - `create_audio_document`
 - `get_mine_all_document_labels`
 - `create_document_label`
+- `delete_document_label`
+- `get_document_detail`
+- `update_document`
+- `search_mine_documents`
 - `create_section_label`
+- `get_mine_all_section_labels`
+- `delete_section_label`
 - `create_section`
+- `update_section`
+- `get_section_detail`
+- `get_section_documents`
 - `get_mine_all_sections`
+- `search_mine_sections`
+- `publish_section`
+- `get_section_publish`
+- `republish_section`
 
 ## Development
 

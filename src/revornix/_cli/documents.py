@@ -3,7 +3,13 @@ from typing import Annotated
 import typer
 
 import revornix.schema.document as DocumentSchema
-from revornix._cli.shared import handle_api_call, normalize_ids, session_from_context
+from revornix._cli.shared import (
+    handle_api_call,
+    normalize_ids,
+    optional_ids,
+    parse_bool,
+    session_from_context,
+)
 
 
 app = typer.Typer(help="Document operations.", no_args_is_help=True)
@@ -151,3 +157,64 @@ def create_audio_document(
         auto_tag=auto_tag,
     )
     handle_api_call(lambda: session.create_audio_document(payload))
+
+
+@app.command("detail")
+def get_document_detail(
+    ctx: typer.Context,
+    document_id: Annotated[int, typer.Option(..., "--document-id", help="Document id.")],
+) -> None:
+    session = session_from_context(ctx)
+    payload = DocumentSchema.DocumentDetailRequest(document_id=document_id)
+    handle_api_call(lambda: session.get_document_detail(payload))
+
+
+@app.command("update")
+def update_document(
+    ctx: typer.Context,
+    document_id: Annotated[int, typer.Option(..., "--document-id", help="Document id.")],
+    labels: Annotated[
+        list[int] | None,
+        typer.Option("--label", help="Label id. Repeat the option for multiple values."),
+    ] = None,
+    sections: Annotated[
+        list[int] | None,
+        typer.Option("--section", help="Section id. Repeat the option for multiple values."),
+    ] = None,
+    title: Annotated[str | None, typer.Option("--title")] = None,
+    description: Annotated[str | None, typer.Option("--description")] = None,
+    cover: Annotated[str | None, typer.Option("--cover")] = None,
+) -> None:
+    session = session_from_context(ctx)
+    payload = DocumentSchema.DocumentUpdateRequest(
+        document_id=document_id,
+        title=title,
+        description=description,
+        cover=cover,
+        labels=optional_ids(labels),
+        sections=optional_ids(sections),
+    )
+    handle_api_call(lambda: session.update_document(payload))
+
+
+@app.command("search-mine")
+def search_mine_documents(
+    ctx: typer.Context,
+    labels: Annotated[
+        list[int] | None,
+        typer.Option("--label", help="Label id. Repeat the option for multiple values."),
+    ] = None,
+    keyword: Annotated[str | None, typer.Option("--keyword")] = None,
+    start: Annotated[int | None, typer.Option("--start")] = None,
+    limit: Annotated[int, typer.Option("--limit")] = 10,
+    desc: Annotated[str, typer.Option("--desc", help="Sort descending: true or false.")] = "true",
+) -> None:
+    session = session_from_context(ctx)
+    payload = DocumentSchema.SearchAllMyDocumentsRequest(
+        keyword=keyword,
+        start=start,
+        limit=limit,
+        label_ids=optional_ids(labels),
+        desc=parse_bool(desc),
+    )
+    handle_api_call(lambda: session.search_mine_documents(payload))

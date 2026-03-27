@@ -2,3 +2,7 @@ class DocumentApi:
     create_document = "/tp/document/create"
     get_mine_all_document_labels = "/tp/document/label/list"
     create_document_label = "/tp/document/label/create"
+    delete_document_label = "/tp/document/label/delete"
+    get_document_detail = "/tp/document/detail"
+    update_document = "/tp/document/update"
+    search_mine_documents = "/tp/document/search/mine"

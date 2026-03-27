@@ -1,4 +1,13 @@
 class SectionApi:
     get_mine_all_section = "/tp/section/mine/all"
     create_section_label = "/tp/section/label/create"
+    get_mine_all_section_labels = "/tp/section/label/list"
+    delete_section_label = "/tp/section/label/delete"
     create_section = "/tp/section/create"
+    update_section = "/tp/section/update"
+    get_section_detail = "/tp/section/detail"
+    get_section_documents = "/tp/section/documents"
+    search_mine_sections = "/tp/section/mine/search"
+    publish_section = "/tp/section/publish"
+    get_section_publish = "/tp/section/publish/get"
+    republish_section = "/tp/section/republish"
