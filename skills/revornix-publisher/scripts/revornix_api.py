@@ -238,8 +238,8 @@ def normalize_base_url(base_url: str) -> str:
 
 
 def resolve_config(args: argparse.Namespace) -> tuple[str, str]:
-    base_url = args.base_url or env_or_none("REVORNIX_BASE_URL", "REVORNIX_URL_PREFIX")
-    api_key = args.api_key or env_or_none("REVORNIX_API_KEY", "API_KEY")
+    base_url = args.base_url or env_or_none("REVORNIX_BASE_URL")
+    api_key = args.api_key or env_or_none("REVORNIX_API_KEY")
     if not base_url:
         raise SystemExit("Missing Revornix base URL. Set REVORNIX_BASE_URL or pass --base-url.")
     if not api_key:

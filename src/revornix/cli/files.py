@@ -3,7 +3,7 @@ from typing import Annotated
 
 import typer
 
-from revornix._cli.shared import handle_api_call, session_from_context
+from revornix.cli.shared import handle_api_call, session_from_context
 
 
 app = typer.Typer(help="File operations.", no_args_is_help=True)

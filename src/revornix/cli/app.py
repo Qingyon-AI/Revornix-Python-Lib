@@ -2,11 +2,11 @@ from typing import Annotated
 
 import typer
 
-from revornix._cli.documents import app as documents_app
-from revornix._cli.files import app as files_app
-from revornix._cli.labels import app as labels_app
-from revornix._cli.sections import app as sections_app
-from revornix._cli.shared import AppConfig
+from revornix.cli.documents import app as documents_app
+from revornix.cli.files import app as files_app
+from revornix.cli.labels import app as labels_app
+from revornix.cli.sections import app as sections_app
+from revornix.cli.shared import AppConfig
 
 
 app = typer.Typer(
@@ -28,7 +28,7 @@ def main_callback(
         typer.Option(
             "--base-url",
             help="Revornix API base URL.",
-            envvar=["REVORNIX_BASE_URL", "REVORNIX_URL_PREFIX"],
+            envvar="REVORNIX_BASE_URL",
         ),
     ] = None,
     api_key: Annotated[
@@ -36,7 +36,7 @@ def main_callback(
         typer.Option(
             "--api-key",
             help="Revornix API key.",
-            envvar=["REVORNIX_API_KEY", "API_KEY"],
+            envvar="REVORNIX_API_KEY",
         ),
     ] = None,
 ) -> None:

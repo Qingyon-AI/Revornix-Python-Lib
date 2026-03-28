@@ -18,10 +18,10 @@ Use the bundled Python script through `bash`. Do not hand-write HTTP requests un
 
 ## Prerequisites
 
-Require one of these environment variable pairs before making API calls:
+Require these environment variables before making API calls:
 
-- `REVORNIX_BASE_URL` and `REVORNIX_API_KEY`
-- `REVORNIX_URL_PREFIX` and `API_KEY`
+- `REVORNIX_BASE_URL`
+- `REVORNIX_API_KEY`
 
 Fail fast if credentials are missing.
 

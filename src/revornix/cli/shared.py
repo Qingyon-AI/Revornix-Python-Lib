@@ -6,7 +6,7 @@ import httpx
 import typer
 from pydantic import BaseModel
 
-from revornix.core import Session
+from revornix.session import Session
 
 
 @dataclass(slots=True)
@@ -15,11 +15,18 @@ class AppConfig:
     api_key: str | None
 
 
-def dump_output(payload: Any) -> None:
+def _to_output_data(payload: Any) -> Any:
     if isinstance(payload, BaseModel):
-        data = payload.model_dump(mode="json", exclude_none=True)
-    else:
-        data = payload
+        return payload.model_dump(mode="json", exclude_none=True)
+    if isinstance(payload, dict):
+        return {key: _to_output_data(value) for key, value in payload.items()}
+    if isinstance(payload, (list, tuple)):
+        return [_to_output_data(item) for item in payload]
+    return payload
+
+
+def dump_output(payload: Any) -> None:
+    data = _to_output_data(payload)
     typer.echo(json.dumps(data, ensure_ascii=False, indent=2))
 
 
@@ -36,7 +43,7 @@ def handle_api_call(callback: Any) -> None:
         raise typer.Exit(code=1) from exc
 
 
-def session_from_context(ctx: typer.Context) -> Session:
+def credentials_from_context(ctx: typer.Context) -> tuple[str, str]:
     config = ctx.obj
     if not config.base_url:
         typer.secho(
@@ -52,7 +59,12 @@ def session_from_context(ctx: typer.Context) -> Session:
             err=True,
         )
         raise typer.Exit(code=2)
-    return Session(base_url=config.base_url, api_key=config.api_key)
+    return config.base_url, config.api_key
+
+
+def session_from_context(ctx: typer.Context) -> Session:
+    base_url, api_key = credentials_from_context(ctx)
+    return Session(base_url=base_url, api_key=api_key)
 
 
 def normalize_ids(values: list[int] | None) -> list[int]:

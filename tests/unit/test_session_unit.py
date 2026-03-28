@@ -3,7 +3,7 @@ from typing import cast
 import httpx
 import revornix.schema.document as DocumentSchema
 import revornix.schema.section as SectionSchema
-from revornix.core import Session
+from revornix.session import Session
 
 
 class DummyResponse:

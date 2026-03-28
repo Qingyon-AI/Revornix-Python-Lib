@@ -3,7 +3,7 @@ from typing import Annotated
 import typer
 
 import revornix.schema.section as SectionSchema
-from revornix._cli.shared import (
+from revornix.cli.shared import (
     handle_api_call,
     normalize_ids,
     optional_ids,

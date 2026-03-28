@@ -28,7 +28,7 @@ def test_create_quick_note_cli_uses_env_and_repeated_ids(monkeypatch):
             DummySession.created_payload = data
             return DocumentSchema.DocumentCreateResponse(document_id=123)
 
-    monkeypatch.setattr("revornix._cli.shared.Session", DummySession)
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
 
     result = runner.invoke(
         cli,
@@ -46,8 +46,8 @@ def test_create_quick_note_cli_uses_env_and_repeated_ids(monkeypatch):
             "--auto-summary",
         ],
         env={
-            "REVORNIX_URL_PREFIX": "https://api.example.com",
-            "API_KEY": "secret-token",
+            "REVORNIX_BASE_URL": "https://api.example.com",
+            "REVORNIX_API_KEY": "secret-token",
         },
     )
 
@@ -60,6 +60,25 @@ def test_create_quick_note_cli_uses_env_and_repeated_ids(monkeypatch):
     assert DummySession.created_payload.sections == [1, 2]
     assert DummySession.created_payload.labels == [9]
     assert DummySession.created_payload.auto_summary is True
+
+
+def test_create_quick_note_cli_rejects_legacy_env_aliases():
+    result = runner.invoke(
+        cli,
+        [
+            "documents",
+            "create-quick-note",
+            "--content",
+            "hello from cli",
+        ],
+        env={
+            "REVORNIX_URL_PREFIX": "https://api.example.com",
+            "API_KEY": "secret-token",
+        },
+    )
+
+    assert result.exit_code == 2
+    assert "Missing Revornix base URL. Use --base-url or REVORNIX_BASE_URL." in result.output
 
 
 def test_upload_file_cli_passes_arguments(monkeypatch, tmp_path):
@@ -78,7 +97,7 @@ def test_upload_file_cli_passes_arguments(monkeypatch, tmp_path):
             }
             return CommonSchema.NormalResponse()
 
-    monkeypatch.setattr("revornix._cli.shared.Session", DummySession)
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
 
     sample_file = tmp_path / "sample.txt"
     sample_file.write_text("demo", encoding="utf-8")
@@ -113,6 +132,66 @@ def test_upload_file_cli_passes_arguments(monkeypatch, tmp_path):
     }
 
 
+def test_upload_create_file_cli_uploads_then_creates_document(monkeypatch, tmp_path):
+    class DummySession:
+        upload_args: ClassVar[dict[str, str] | None] = None
+        created_payload: ClassVar[DocumentSchema.FileDocumentParameters | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def upload_file(self, local_file_path: str, remote_file_path: str, content_type: str):
+            DummySession.upload_args = {
+                "local_file_path": local_file_path,
+                "remote_file_path": remote_file_path,
+                "content_type": content_type,
+            }
+            return CommonSchema.NormalResponse()
+
+        def create_file_document(self, data):
+            DummySession.created_payload = data
+            return DocumentSchema.DocumentCreateResponse(document_id=456)
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    sample_file = tmp_path / "sample.txt"
+    sample_file.write_text("demo", encoding="utf-8")
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "documents",
+            "upload-create-file",
+            "--local-file-path",
+            str(sample_file),
+            "--section",
+            "1",
+            "--label",
+            "2",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert json.loads(result.stdout) == {
+        "upload": {"success": True, "message": "Success"},
+        "document": {"document_id": 456},
+    }
+    assert DummySession.upload_args == {
+        "local_file_path": str(sample_file.resolve()),
+        "remote_file_path": "sample.txt",
+        "content_type": "text/plain",
+    }
+    assert DummySession.created_payload is not None
+    assert DummySession.created_payload.file_name == "sample.txt"
+    assert DummySession.created_payload.sections == [1]
+    assert DummySession.created_payload.labels == [2]
+
+
 def test_subcommand_help_does_not_require_credentials():
     result = runner.invoke(cli, ["documents", "create-quick-note", "--help"])
 
@@ -132,7 +211,7 @@ def test_document_detail_cli_passes_document_id(monkeypatch):
             DummySession.payload = data
             return {"id": 7, "title": "Demo"}
 
-    monkeypatch.setattr("revornix._cli.shared.Session", DummySession)
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
 
     result = runner.invoke(
         cli,
@@ -166,7 +245,7 @@ def test_delete_section_label_cli_passes_repeated_ids(monkeypatch):
             DummySession.payload = data
             return CommonSchema.NormalResponse()
 
-    monkeypatch.setattr("revornix._cli.shared.Session", DummySession)
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
 
     result = runner.invoke(
         cli,
@@ -176,7 +255,7 @@ def test_delete_section_label_cli_passes_repeated_ids(monkeypatch):
             "--api-key",
             "secret-token",
             "labels",
-            "delete-section",
+            "delete-section-labels",
             "--label-id",
             "1",
             "--label-id",
@@ -188,6 +267,39 @@ def test_delete_section_label_cli_passes_repeated_ids(monkeypatch):
     assert DummySession.payload is not None
     assert DummySession.payload.label_ids == [1, 2]
     assert json.loads(result.stdout) == {"success": True, "message": "Success"}
+
+
+def test_legacy_delete_section_label_alias_still_works(monkeypatch):
+    class DummySession:
+        payload: ClassVar[SectionSchema.LabelDeleteRequest | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def delete_section_label(self, data):
+            DummySession.payload = data
+            return CommonSchema.NormalResponse()
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "labels",
+            "delete-section",
+            "--label-id",
+            "3",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert DummySession.payload is not None
+    assert DummySession.payload.label_ids == [3]
 
 
 def test_search_mine_documents_cli_passes_filters(monkeypatch):
@@ -209,7 +321,7 @@ def test_search_mine_documents_cli_passes_filters(monkeypatch):
                 "next_start": None,
             }
 
-    monkeypatch.setattr("revornix._cli.shared.Session", DummySession)
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
 
     result = runner.invoke(
         cli,
@@ -256,7 +368,7 @@ def test_update_section_cli_passes_optional_fields(monkeypatch):
             DummySession.payload = data
             return CommonSchema.NormalResponse()
 
-    monkeypatch.setattr("revornix._cli.shared.Session", DummySession)
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
 
     result = runner.invoke(
         cli,
@@ -309,7 +421,7 @@ def test_publish_section_cli_passes_status(monkeypatch):
             DummySession.payload = data
             return CommonSchema.NormalResponse()
 
-    monkeypatch.setattr("revornix._cli.shared.Session", DummySession)
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
 
     result = runner.invoke(
         cli,
@@ -331,3 +443,4 @@ def test_publish_section_cli_passes_status(monkeypatch):
     assert DummySession.payload is not None
     assert DummySession.payload.section_id == 12
     assert DummySession.payload.status is True
+

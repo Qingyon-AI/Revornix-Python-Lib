@@ -8,9 +8,9 @@ import revornix.schema.common as CommonSchema
 import revornix.schema.document as DocumentSchema
 import revornix.schema.pagination as PaginationSchema
 import revornix.schema.section as SectionSchema
-from revornix.api.document import DocumentApi
-from revornix.api.file import FileApi
-from revornix.api.section import SectionApi
+from revornix.endpoints.document import DocumentApi
+from revornix.endpoints.file import FileApi
+from revornix.endpoints.section import SectionApi
 
 
 ResponseModelT = TypeVar("ResponseModelT", bound=BaseModel)

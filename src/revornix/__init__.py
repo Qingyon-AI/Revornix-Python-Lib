@@ -1,1 +1,1 @@
-from revornix.core import Session
+from revornix.session import Session

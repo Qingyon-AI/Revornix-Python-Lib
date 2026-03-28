@@ -2,46 +2,46 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
-Python SDK and CLI for the Revornix API.
+Revornix API 的 Python SDK 与 CLI。
 
-📕 API Documentation: [revornix/api](https://revornix.com/en/docs/features/api)
+📕 API 文档：[revornix/api](https://revornix.com/en/docs/features/api)
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Qingyon-AI/Revornix)
 
-## Full Application
+## 完整应用
 
-The full Revornix application is available here:
+完整的 Revornix 应用在这里：
 
 [Qingyon-AI/Revornix](https://github.com/Qingyon-AI/Revornix)
 
-## Introduction
+## 项目简介
 
-- RoadMap: [RoadMap](https://huaqinda.notion.site/RoadMap-224bbdbfa03380fabd7beda0b0337ea3)
-- Official Website: [revornix.com](https://revornix.com)
-- Community: [Discord](https://discord.com/invite/3XZfz84aPN) | [WeChat](https://github.com/Qingyon-AI/Revornix/discussions/1#discussioncomment-13638435) | [QQ](https://github.com/Qingyon-AI/Revornix/discussions/1#discussioncomment-13638435)
+- 路线图：[RoadMap](https://huaqinda.notion.site/RoadMap-224bbdbfa03380fabd7beda0b0337ea3)
+- 官网：[revornix.com](https://revornix.com)
+- 社区：[Discord](https://discord.com/invite/3XZfz84aPN) | [微信](https://github.com/Qingyon-AI/Revornix/discussions/1#discussioncomment-13638435) | [QQ](https://github.com/Qingyon-AI/Revornix/discussions/1#discussioncomment-13638435)
 
-## Installation
+## 安装
 
-Install from PyPI:
+从 PyPI 安装：
 
 ```shell
 pip install revornix
 ```
 
-Install from source for local development:
+本地开发时从源码安装：
 
 ```shell
 pip install -e .
 ```
 
-## Authentication
+## 认证
 
-Both the Python SDK and CLI require:
+Python SDK 和 CLI 都需要以下凭据：
 
-- `base_url`: your Revornix API base URL
-- `api_key`: your Revornix API key
+- `base_url`：你的 Revornix API 基础地址
+- `api_key`：你的 Revornix API Key
 
-For CLI usage, these environment variables are supported:
+CLI 支持以下环境变量：
 
 ```shell
 export REVORNIX_BASE_URL="YOUR_API_PREFIX"
@@ -50,21 +50,21 @@ export REVORNIX_API_KEY="YOUR_API_KEY"
 
 ## CLI
 
-After installation, the `revornix` command is available.
+安装完成后，可以使用 `revornix` 命令。
 
-Show help:
+查看帮助：
 
 ```shell
 revornix --help
 ```
 
-You can pass credentials with flags:
+你也可以直接通过参数传入凭据：
 
 ```shell
 revornix --base-url "YOUR_API_PREFIX" --api-key "YOUR_API_KEY" --help
 ```
 
-Or use environment variables:
+或者使用环境变量：
 
 ```shell
 export REVORNIX_BASE_URL="YOUR_API_PREFIX"
@@ -72,9 +72,9 @@ export REVORNIX_API_KEY="YOUR_API_KEY"
 revornix --help
 ```
 
-### CLI Quick Start
+### CLI 快速开始
 
-Upload a file:
+上传文件：
 
 ```shell
 revornix files upload \
@@ -82,7 +82,7 @@ revornix files upload \
   --remote-file-path uploads/test.txt
 ```
 
-Create a quick note document:
+创建快速笔记文档：
 
 ```shell
 revornix documents create-quick-note \
@@ -93,7 +93,7 @@ revornix documents create-quick-note \
   --auto-summary
 ```
 
-Create a website document:
+创建网页文档：
 
 ```shell
 revornix documents create-website \
@@ -102,7 +102,7 @@ revornix documents create-website \
   --label 10
 ```
 
-Create a file document:
+创建文件文档：
 
 ```shell
 revornix documents create-file \
@@ -111,7 +111,7 @@ revornix documents create-file \
   --label 10
 ```
 
-Create an audio document:
+创建音频文档：
 
 ```shell
 revornix documents create-audio \
@@ -121,7 +121,7 @@ revornix documents create-audio \
   --auto-transcribe
 ```
 
-Upload a local file and create a file document in one step:
+本地文件上传并一步创建文件文档：
 
 ```shell
 revornix documents upload-create-file \
@@ -131,43 +131,43 @@ revornix documents upload-create-file \
   --label 10
 ```
 
-Create a document label:
+创建文档标签：
 
 ```shell
 revornix labels create-document-label --name research
 ```
 
-Create a section label:
+创建专栏标签：
 
 ```shell
 revornix labels create-section-label --name tutorial
 ```
 
-List all document labels:
+列出所有文档标签：
 
 ```shell
 revornix labels list-document-labels
 ```
 
-List all sections:
+列出所有专栏：
 
 ```shell
 revornix sections list
 ```
 
-Get document detail:
+获取文档详情：
 
 ```shell
 revornix documents detail --document-id 123
 ```
 
-Search my documents:
+搜索我的文档：
 
 ```shell
 revornix documents search-mine --keyword notes --label 10 --desc true
 ```
 
-Create a section:
+创建专栏：
 
 ```shell
 revornix sections create \
@@ -178,23 +178,23 @@ revornix sections create \
   --auto-publish
 ```
 
-Get section detail:
+获取专栏详情：
 
 ```shell
 revornix sections detail --section-id 12
 ```
 
-Publish a section:
+发布专栏：
 
 ```shell
 revornix sections publish --section-id 12 --status true
 ```
 
-### CLI Command Reference
+### CLI 命令参考
 
 #### `files`
 
-Upload a local file:
+上传本地文件：
 
 ```shell
 revornix files upload \
@@ -205,7 +205,7 @@ revornix files upload \
 
 #### `documents`
 
-Create a file document:
+创建文件文档：
 
 ```shell
 revornix documents create-file \
@@ -217,7 +217,7 @@ revornix documents create-file \
   --auto-summary
 ```
 
-Create a website document:
+创建网页文档：
 
 ```shell
 revornix documents create-website \
@@ -228,7 +228,7 @@ revornix documents create-website \
   --auto-summary
 ```
 
-Create a quick note document:
+创建快速笔记文档：
 
 ```shell
 revornix documents create-quick-note \
@@ -238,7 +238,7 @@ revornix documents create-quick-note \
   --label 10
 ```
 
-Create an audio document:
+创建音频文档：
 
 ```shell
 revornix documents create-audio \
@@ -250,7 +250,7 @@ revornix documents create-audio \
   --auto-summary
 ```
 
-Upload a file and create a file document in one command:
+上传文件并在一个命令里创建文件文档：
 
 ```shell
 revornix documents upload-create-file \
@@ -261,7 +261,7 @@ revornix documents upload-create-file \
   --label 10
 ```
 
-Upload an audio file and create an audio document in one command:
+上传音频文件并在一个命令里创建音频文档：
 
 ```shell
 revornix documents upload-create-audio \
@@ -273,13 +273,13 @@ revornix documents upload-create-audio \
   --auto-transcribe
 ```
 
-Get document detail:
+获取文档详情：
 
 ```shell
 revornix documents detail --document-id 123
 ```
 
-Update document metadata:
+更新文档元数据：
 
 ```shell
 revornix documents update \
@@ -289,7 +289,7 @@ revornix documents update \
   --label 10
 ```
 
-Search my documents:
+搜索我的文档：
 
 ```shell
 revornix documents search-mine \
@@ -302,37 +302,37 @@ revornix documents search-mine \
 
 #### `labels`
 
-List document labels:
+列出文档标签：
 
 ```shell
 revornix labels list-document-labels
 ```
 
-Create a document label:
+创建文档标签：
 
 ```shell
 revornix labels create-document-label --name article
 ```
 
-Create a section label:
+创建专栏标签：
 
 ```shell
 revornix labels create-section-label --name collection
 ```
 
-List section labels:
+列出专栏标签：
 
 ```shell
 revornix labels list-section-labels
 ```
 
-Delete document labels:
+删除文档标签：
 
 ```shell
 revornix labels delete-document-labels --label-id 10 --label-id 11
 ```
 
-Delete section labels:
+删除专栏标签：
 
 ```shell
 revornix labels delete-section-labels --label-id 20 --label-id 21
@@ -340,13 +340,13 @@ revornix labels delete-section-labels --label-id 20 --label-id 21
 
 #### `sections`
 
-List sections:
+列出专栏：
 
 ```shell
 revornix sections list
 ```
 
-Create a section:
+创建专栏：
 
 ```shell
 revornix sections create \
@@ -357,25 +357,25 @@ revornix sections create \
   --label 10
 ```
 
-Get section detail:
+获取专栏详情：
 
 ```shell
 revornix sections detail --section-id 12
 ```
 
-List section documents:
+列出专栏内的文档：
 
 ```shell
 revornix sections documents --section-id 12 --start 0 --limit 20 --desc true
 ```
 
-Search my sections:
+搜索我的专栏：
 
 ```shell
 revornix sections search-mine --keyword digest --label 10 --desc true
 ```
 
-Update a section:
+更新专栏：
 
 ```shell
 revornix sections update \
@@ -385,33 +385,33 @@ revornix sections update \
   --auto-illustration false
 ```
 
-Get publish status:
+获取发布状态：
 
 ```shell
 revornix sections get-publish --section-id 12
 ```
 
-Publish or unpublish:
+发布或取消发布：
 
 ```shell
 revornix sections publish --section-id 12 --status true
 revornix sections publish --section-id 12 --status false
 ```
 
-Republish:
+重新发布：
 
 ```shell
 revornix sections republish --section-id 12
 ```
 
-### CLI Notes
+### CLI 说明
 
-- Use repeated `--section` options to pass multiple sections.
-- Use repeated `--label` options to pass multiple labels.
-- `--section` and `--label` expect numeric IDs.
-- CLI responses are printed as JSON.
-- `documents upload-create-file` and `documents upload-create-audio` upload the local file first, then create the corresponding document.
-Example:
+- 多个专栏请重复传入 `--section`
+- 多个标签请重复传入 `--label`
+- `--section` 和 `--label` 都要求传数值 ID
+- CLI 响应会以 JSON 输出
+- `documents upload-create-file` 和 `documents upload-create-audio` 会先上传本地文件，再创建对应文档
+示例：
 
 ```shell
 revornix documents create-quick-note \
@@ -424,7 +424,7 @@ revornix documents create-quick-note \
 
 ## Python SDK
 
-### Create a Session
+### 创建 Session
 
 ```python
 from revornix import Session
@@ -435,13 +435,13 @@ session = Session(
 )
 ```
 
-### Import Schema Models
+### 导入 Schema 模型
 
 ```python
 from revornix.schema import DocumentSchema, SectionSchema
 ```
 
-### Upload a File
+### 上传文件
 
 ```python
 from revornix import Session
@@ -457,7 +457,7 @@ res = session.upload_file(
 )
 ```
 
-### Create a Document Label
+### 创建文档标签
 
 ```python
 from revornix import Session
@@ -472,7 +472,7 @@ data = DocumentSchema.LabelAddRequest(name="test")
 res = session.create_document_label(data=data)
 ```
 
-### Create a Section Label
+### 创建专栏标签
 
 ```python
 from revornix import Session
@@ -487,7 +487,7 @@ data = SectionSchema.LabelAddRequest(name="test")
 res = session.create_section_label(data=data)
 ```
 
-### Create a Section
+### 创建专栏
 
 ```python
 from revornix import Session
@@ -513,7 +513,7 @@ data = SectionSchema.SectionCreateRequest(
 res = session.create_section(data=data)
 ```
 
-### Get All Document Labels
+### 获取所有文档标签
 
 ```python
 from revornix import Session
@@ -526,7 +526,7 @@ session = Session(
 res = session.get_mine_all_document_labels()
 ```
 
-### Get All Sections
+### 获取所有专栏
 
 ```python
 from revornix import Session
@@ -539,7 +539,7 @@ session = Session(
 res = session.get_mine_all_sections()
 ```
 
-### Create a Quick Note Document
+### 创建快速笔记文档
 
 ```python
 from revornix import Session
@@ -565,7 +565,7 @@ data = DocumentSchema.QuickNoteDocumentParameters(
 res = session.create_quick_note_document(data=data)
 ```
 
-### Create a Website Document
+### 创建网页文档
 
 ```python
 from revornix import Session
@@ -591,7 +591,7 @@ data = DocumentSchema.WebsiteDocumentParameters(
 res = session.create_website_document(data=data)
 ```
 
-### Create a File Document
+### 创建文件文档
 
 ```python
 from revornix import Session
@@ -617,7 +617,7 @@ data = DocumentSchema.FileDocumentParameters(
 res = session.create_file_document(data=data)
 ```
 
-### Create an Audio Document
+### 创建音频文档
 
 ```python
 from revornix import Session
@@ -644,9 +644,9 @@ data = DocumentSchema.AudioDocumentParameters(
 res = session.create_audio_document(data=data)
 ```
 
-## Available SDK Methods
+## 可用的 SDK 方法
 
-The current `Session` methods are:
+当前 `Session` 提供的方法有：
 
 - `upload_file`
 - `create_file_document`
@@ -672,44 +672,44 @@ The current `Session` methods are:
 - `get_section_publish`
 - `republish_section`
 
-## Development
+## 开发
 
-Project layout:
+项目结构：
 
-- `src/revornix/session.py`: core `Session` client for the Revornix API
-- `src/revornix/cli/`: Typer CLI entrypoint, command groups, and CLI workflows
-- `src/revornix/schema/`: Pydantic request and response models
-- `src/revornix/endpoints/`: API endpoint constants
-- `tests/unit/`: unit tests that do not hit the real network
-- `tests/integration/`: opt-in real API integration tests
-- `tests/fixtures/`: local files used by tests and CLI examples
+- `src/revornix/session.py`：Revornix API 的核心 `Session` 客户端
+- `src/revornix/cli/`：Typer CLI 入口、命令分组和 CLI 工作流
+- `src/revornix/schema/`：Pydantic 请求与响应模型
+- `src/revornix/endpoints/`：API 端点常量
+- `tests/unit/`：不访问真实网络的单元测试
+- `tests/integration/`：按需启用的真实 API 集成测试
+- `tests/fixtures/`：测试和 CLI 示例使用的本地文件
 
-Run tests:
+运行测试：
 
 ```shell
 pytest
 ```
 
-Run CLI tests only:
+只运行 CLI 测试：
 
 ```shell
 pytest tests/unit/test_cli.py
 ```
 
-Run all unit tests:
+运行全部单元测试：
 
 ```shell
 pytest tests/unit
 ```
 
-Integration tests are opt-in and require both credentials and an explicit switch:
+集成测试默认不运行；需要同时提供凭据并显式打开开关：
 
 ```shell
 export REVORNIX_RUN_INTEGRATION_TESTS=true
 pytest tests/integration
 ```
 
-## Contributors
+## 贡献者
 
 <a href="https://github.com/Qingyon-AI/Revornx/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=Qingyon-AI/Revornix" />
