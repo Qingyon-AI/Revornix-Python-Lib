@@ -328,6 +328,19 @@ def update_document(
     handle_api_call(lambda: session.update_document(payload))
 
 
+@app.command("delete")
+def delete_document(
+    ctx: typer.Context,
+    document_ids: Annotated[
+        list[int],
+        typer.Option("--document-id", help="Document id. Repeat the option for multiple values."),
+    ],
+) -> None:
+    session = session_from_context(ctx)
+    payload = DocumentSchema.DocumentDeleteRequest(document_ids=list(document_ids))
+    handle_api_call(lambda: session.delete_document(payload))
+
+
 @app.command("search-mine")
 def search_mine_documents(
     ctx: typer.Context,

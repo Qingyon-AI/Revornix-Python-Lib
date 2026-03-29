@@ -95,6 +95,10 @@ class SearchAllMyDocumentsRequest(BaseModel):
     desc: bool = True
 
 
+class DocumentDeleteRequest(BaseModel):
+    document_ids: list[int]
+
+
 class DocumentDetailRequest(BaseModel):
     document_id: int
 

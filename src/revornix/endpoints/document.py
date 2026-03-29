@@ -5,5 +5,6 @@ class DocumentApi:
     delete_document_label = "/tp/document/label/delete"
     get_document_detail = "/tp/document/detail"
     update_document = "/tp/document/update"
+    delete_document = "/tp/document/delete"
     search_mine_documents = "/tp/document/search/mine"
     search_document_vector = "/tp/document/vector/search"

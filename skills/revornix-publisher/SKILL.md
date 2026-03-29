@@ -1,6 +1,6 @@
 ---
 name: revornix-publisher
-description: Create, search, inspect, update, publish, and organize Revornix sections, labels, and documents from OpenClaw. Use when the user asks to create Revornix 专栏 or section, 标签 or label, quick note, website document, file document, audio document, upload files, inspect document or section detail, search mine documents or sections, run document vector search, update metadata, or publish or republish sections in Revornix.
+description: Create, search, inspect, update, delete, publish, and organize Revornix sections, labels, and documents from OpenClaw. Use when the user asks to create Revornix 专栏 or section, 标签 or label, quick note, website document, file document, audio document, upload files, inspect document or section detail, search mine documents or sections, run document vector search, update or delete metadata objects, or publish or republish sections in Revornix.
 version: 1.2.0
 metadata:
   openclaw:
@@ -44,6 +44,7 @@ If the skill is installed under a different root, keep using the bundled script 
    - If the user provides a local file, prefer `upload-and-create-file-document` or `upload-and-create-audio-document`.
    - If the file is already present in Revornix storage, use `create-file-document` or `create-audio-document`.
 5. Use repeated `--section`, `--label`, or `--label-id` flags for multiple values.
+   Use repeated `--document-id` flags when deleting multiple documents.
 6. For search and publish style commands, pass explicit boolean text such as `true` or `false`.
 7. For document vector search, remind the user that results depend on documents already having embeddings on the server side.
 8. Return the JSON result and call out created or updated IDs in the final reply.
@@ -88,6 +89,12 @@ python3 skills/revornix-publisher/scripts/revornix_api.py update-section \
   --title "Weekly Digest" \
   --auto-podcast true \
   --auto-illustration false
+```
+
+Delete a section:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py delete-section --section-id 12
 ```
 
 Publish or unpublish a section:
@@ -176,6 +183,14 @@ python3 skills/revornix-publisher/scripts/revornix_api.py update-document \
   --label 10
 ```
 
+Delete documents:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py delete-document \
+  --document-id 123 \
+  --document-id 124
+```
+
 Upload a local file and create a file document:
 
 ```bash
@@ -201,5 +216,6 @@ python3 skills/revornix-publisher/scripts/revornix_api.py upload-and-create-audi
 
 - Do not invent section IDs, document IDs, or label IDs.
 - Do not create duplicate labels or sections when an existing one already matches the user intent.
+- Before deleting when the target is ambiguous, fetch detail or search results first to confirm the correct object.
 - Do not expose API keys in responses.
 - Prefer reading detail or list endpoints before update or publish operations when the target object is ambiguous.

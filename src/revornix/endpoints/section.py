@@ -5,6 +5,7 @@ class SectionApi:
     delete_section_label = "/tp/section/label/delete"
     create_section = "/tp/section/create"
     update_section = "/tp/section/update"
+    delete_section = "/tp/section/delete"
     get_section_detail = "/tp/section/detail"
     get_section_documents = "/tp/section/documents"
     search_mine_sections = "/tp/section/mine/search"

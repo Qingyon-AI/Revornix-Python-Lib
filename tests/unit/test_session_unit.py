@@ -146,6 +146,64 @@ def test_get_section_detail_parses_nested_response():
     assert result.process_task.status == 1
 
 
+def test_delete_document_posts_payload_and_returns_success_response():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/document/delete": {
+                "success": True,
+                "message": "Success",
+                "code": 200,
+            }
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    result = session.delete_document(
+        DocumentSchema.DocumentDeleteRequest(document_ids=[7, 8])
+    )
+
+    assert dummy_client.calls == [
+        {
+            "endpoint": "/tp/document/delete",
+            "json": {"document_ids": [7, 8]},
+            "files": None,
+            "data": None,
+        }
+    ]
+    assert result.success is True
+    assert result.code == 200
+
+
+def test_delete_section_posts_payload_and_returns_success_response():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/section/delete": {
+                "success": True,
+                "message": "Success",
+                "code": 200,
+            }
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    result = session.delete_section(
+        SectionSchema.SectionDeleteRequest(section_id=12)
+    )
+
+    assert dummy_client.calls == [
+        {
+            "endpoint": "/tp/section/delete",
+            "json": {"section_id": 12},
+            "files": None,
+            "data": None,
+        }
+    ]
+    assert result.success is True
+    assert result.code == 200
+
+
 def test_publish_section_posts_payload_and_returns_success_response():
     session = Session(base_url="https://api.example.com", api_key="secret-token")
     dummy_client = DummyClient(

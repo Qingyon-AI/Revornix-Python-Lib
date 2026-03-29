@@ -233,6 +233,42 @@ def test_document_detail_cli_passes_document_id(monkeypatch):
     assert DummySession.payload.document_id == 7
 
 
+def test_delete_document_cli_passes_repeated_ids(monkeypatch):
+    class DummySession:
+        payload: ClassVar[DocumentSchema.DocumentDeleteRequest | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def delete_document(self, data):
+            DummySession.payload = data
+            return CommonSchema.NormalResponse()
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "documents",
+            "delete",
+            "--document-id",
+            "7",
+            "--document-id",
+            "8",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert DummySession.payload is not None
+    assert DummySession.payload.document_ids == [7, 8]
+    assert json.loads(result.stdout) == {"success": True, "message": "Success"}
+
+
 def test_delete_section_label_cli_passes_repeated_ids(monkeypatch):
     class DummySession:
         payload: ClassVar[SectionSchema.LabelDeleteRequest | None] = None
@@ -441,6 +477,40 @@ def test_update_section_cli_passes_optional_fields(monkeypatch):
     assert DummySession.payload.auto_podcast is True
     assert DummySession.payload.auto_illustration is False
     assert DummySession.payload.process_task_trigger_type == 2
+
+
+def test_delete_section_cli_passes_section_id(monkeypatch):
+    class DummySession:
+        payload: ClassVar[SectionSchema.SectionDeleteRequest | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def delete_section(self, data):
+            DummySession.payload = data
+            return CommonSchema.NormalResponse()
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "sections",
+            "delete",
+            "--section-id",
+            "12",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert DummySession.payload is not None
+    assert DummySession.payload.section_id == 12
+    assert json.loads(result.stdout) == {"success": True, "message": "Success"}
 
 
 def test_publish_section_cli_passes_status(monkeypatch):

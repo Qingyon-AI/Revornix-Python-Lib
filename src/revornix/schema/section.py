@@ -55,6 +55,10 @@ class SectionDetailRequest(BaseModel):
     section_id: int
 
 
+class SectionDeleteRequest(BaseModel):
+    section_id: int
+
+
 class SearchMineSectionsRequest(BaseModel):
     keyword: str | None = None
     start: int | None = None

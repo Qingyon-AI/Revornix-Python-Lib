@@ -159,6 +159,16 @@ def update_section(
     handle_api_call(lambda: session.update_section(payload))
 
 
+@app.command("delete")
+def delete_section(
+    ctx: typer.Context,
+    section_id: Annotated[int, typer.Option(..., "--section-id", help="Section id.")],
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.SectionDeleteRequest(section_id=section_id)
+    handle_api_call(lambda: session.delete_section(payload))
+
+
 @app.command("publish")
 def publish_section(
     ctx: typer.Context,

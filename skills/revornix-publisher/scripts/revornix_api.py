@@ -18,6 +18,7 @@ CREATE_DOCUMENT_LABEL_ENDPOINT = "/tp/document/label/create"
 DELETE_DOCUMENT_LABEL_ENDPOINT = "/tp/document/label/delete"
 DOCUMENT_DETAIL_ENDPOINT = "/tp/document/detail"
 UPDATE_DOCUMENT_ENDPOINT = "/tp/document/update"
+DELETE_DOCUMENT_ENDPOINT = "/tp/document/delete"
 SEARCH_MINE_DOCUMENTS_ENDPOINT = "/tp/document/search/mine"
 SEARCH_DOCUMENT_VECTOR_ENDPOINT = "/tp/document/vector/search"
 
@@ -27,6 +28,7 @@ LIST_SECTION_LABELS_ENDPOINT = "/tp/section/label/list"
 DELETE_SECTION_LABEL_ENDPOINT = "/tp/section/label/delete"
 CREATE_SECTION_ENDPOINT = "/tp/section/create"
 UPDATE_SECTION_ENDPOINT = "/tp/section/update"
+DELETE_SECTION_ENDPOINT = "/tp/section/delete"
 SECTION_DETAIL_ENDPOINT = "/tp/section/detail"
 SECTION_DOCUMENTS_ENDPOINT = "/tp/section/documents"
 SEARCH_MINE_SECTIONS_ENDPOINT = "/tp/section/mine/search"
@@ -86,6 +88,9 @@ def parse_args() -> argparse.Namespace:
     update_section_parser.add_argument("--auto-illustration", type=parse_bool, default=None)
     update_section_parser.add_argument("--process-task-trigger-type", type=int, default=None)
     update_section_parser.add_argument("--process-task-trigger-scheduler", default=None)
+
+    delete_section_parser = subparsers.add_parser("delete-section", help="Delete a section.")
+    delete_section_parser.add_argument("--section-id", required=True, type=int)
 
     section_detail_parser = subparsers.add_parser("section-detail", help="Get section detail.")
     section_detail_parser.add_argument("--section-id", required=True, type=int)
@@ -188,6 +193,9 @@ def parse_args() -> argparse.Namespace:
     update_document_parser.add_argument("--cover", default=None)
     update_document_parser.add_argument("--section", action="append", type=int)
     update_document_parser.add_argument("--label", action="append", type=int)
+
+    delete_document_parser = subparsers.add_parser("delete-document", help="Delete documents.")
+    delete_document_parser.add_argument("--document-id", action="append", type=int, required=True)
 
     search_mine_documents_parser = subparsers.add_parser(
         "search-mine-documents",
@@ -417,6 +425,15 @@ def update_document(base_url: str, api_key: str, args: argparse.Namespace) -> di
     return post_json(base_url, api_key, UPDATE_DOCUMENT_ENDPOINT, payload)
 
 
+def delete_document(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    return post_json(
+        base_url,
+        api_key,
+        DELETE_DOCUMENT_ENDPOINT,
+        {"document_ids": args.document_id},
+    )
+
+
 def search_mine_documents(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
     payload = {
         "keyword": args.keyword,
@@ -500,6 +517,10 @@ def update_section(base_url: str, api_key: str, args: argparse.Namespace) -> dic
     }
     payload = {key: value for key, value in payload.items() if value is not None}
     return post_json(base_url, api_key, UPDATE_SECTION_ENDPOINT, payload)
+
+
+def delete_section(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    return post_json(base_url, api_key, DELETE_SECTION_ENDPOINT, {"section_id": args.section_id})
 
 
 def get_section_detail(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
@@ -591,6 +612,8 @@ def main() -> None:
         result = create_section(base_url, api_key, args)
     elif args.command == "update-section":
         result = update_section(base_url, api_key, args)
+    elif args.command == "delete-section":
+        result = delete_section(base_url, api_key, args)
     elif args.command == "section-detail":
         result = get_section_detail(base_url, api_key, args)
     elif args.command == "section-documents":
@@ -625,6 +648,8 @@ def main() -> None:
         result = get_document_detail(base_url, api_key, args)
     elif args.command == "update-document":
         result = update_document(base_url, api_key, args)
+    elif args.command == "delete-document":
+        result = delete_document(base_url, api_key, args)
     elif args.command == "search-mine-documents":
         result = search_mine_documents(base_url, api_key, args)
     elif args.command == "search-document-vector":

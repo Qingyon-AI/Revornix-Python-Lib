@@ -1,6 +1,6 @@
 [project]
 name = "revornix"
-version = "0.1.1"
+version = "0.1.2"
 description = "The python package for Revornix API."
 authors = [
     { name = "Kinda Hall", email = "1142704468@qq.com" }

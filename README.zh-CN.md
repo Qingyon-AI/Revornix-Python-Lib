@@ -295,6 +295,12 @@ revornix documents update \
   --label 10
 ```
 
+删除文档：
+
+```shell
+revornix documents delete --document-id 123 --document-id 124
+```
+
 搜索我的文档：
 
 ```shell
@@ -395,6 +401,12 @@ revornix sections update \
   --title "Weekly Digest" \
   --auto-podcast true \
   --auto-illustration false
+```
+
+删除专栏：
+
+```shell
+revornix sections delete --section-id 12
 ```
 
 获取发布状态：
@@ -672,6 +684,36 @@ data = DocumentSchema.VectorSearchRequest(query="检索增强生成")
 res = session.search_document_vector(data=data)
 ```
 
+### 删除文档
+
+```python
+from revornix import Session
+from revornix.schema import DocumentSchema
+
+session = Session(
+    base_url="YOUR_API_PREFIX",
+    api_key="YOUR_API_KEY",
+)
+
+data = DocumentSchema.DocumentDeleteRequest(document_ids=[123, 124])
+res = session.delete_document(data=data)
+```
+
+### 删除专栏
+
+```python
+from revornix import Session
+from revornix.schema import SectionSchema
+
+session = Session(
+    base_url="YOUR_API_PREFIX",
+    api_key="YOUR_API_KEY",
+)
+
+data = SectionSchema.SectionDeleteRequest(section_id=12)
+res = session.delete_section(data=data)
+```
+
 ## 可用的 SDK 方法
 
 当前 `Session` 提供的方法有：
@@ -686,6 +728,7 @@ res = session.search_document_vector(data=data)
 - `delete_document_label`
 - `get_document_detail`
 - `update_document`
+- `delete_document`
 - `search_mine_documents`
 - `search_document_vector`
 - `create_section_label`
@@ -693,6 +736,7 @@ res = session.search_document_vector(data=data)
 - `delete_section_label`
 - `create_section`
 - `update_section`
+- `delete_section`
 - `get_section_detail`
 - `get_section_documents`
 - `get_mine_all_sections`

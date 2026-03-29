@@ -147,6 +147,16 @@ class Session:
             data,
         )
 
+    def delete_document(
+        self,
+        data: DocumentSchema.DocumentDeleteRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(
+            DocumentApi.delete_document,
+            CommonSchema.NormalResponse,
+            data,
+        )
+
     def search_mine_documents(
         self,
         data: DocumentSchema.SearchAllMyDocumentsRequest,
@@ -210,6 +220,16 @@ class Session:
     ) -> CommonSchema.NormalResponse:
         return self._post_json(
             SectionApi.update_section,
+            CommonSchema.NormalResponse,
+            data,
+        )
+
+    def delete_section(
+        self,
+        data: SectionSchema.SectionDeleteRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(
+            SectionApi.delete_section,
             CommonSchema.NormalResponse,
             data,
         )
