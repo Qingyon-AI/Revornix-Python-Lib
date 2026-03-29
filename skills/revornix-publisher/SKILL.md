@@ -1,7 +1,7 @@
 ---
 name: revornix-publisher
-description: Create, search, inspect, update, publish, and organize Revornix sections, labels, and documents from OpenClaw. Use when the user asks to create Revornix 专栏 or section, 标签 or label, quick note, website document, file document, audio document, upload files, inspect document or section detail, search mine documents or sections, update metadata, or publish or republish sections in Revornix.
-version: 1.1.0
+description: Create, search, inspect, update, publish, and organize Revornix sections, labels, and documents from OpenClaw. Use when the user asks to create Revornix 专栏 or section, 标签 or label, quick note, website document, file document, audio document, upload files, inspect document or section detail, search mine documents or sections, run document vector search, update metadata, or publish or republish sections in Revornix.
+version: 1.2.0
 metadata:
   openclaw:
     requires:
@@ -37,7 +37,7 @@ If the skill is installed under a different root, keep using the bundled script 
 
 ## Workflow
 
-1. Determine whether the user wants to list, inspect, create, update, delete, search, publish, or republish.
+1. Determine whether the user wants to list, inspect, create, update, delete, search, vector-search, publish, or republish.
 2. Resolve section IDs and label IDs before creating or updating documents when the user only provides names.
 3. Prefer listing existing sections or labels before creating new ones when duplication is possible.
 4. For file and audio documents:
@@ -45,7 +45,8 @@ If the skill is installed under a different root, keep using the bundled script 
    - If the file is already present in Revornix storage, use `create-file-document` or `create-audio-document`.
 5. Use repeated `--section`, `--label`, or `--label-id` flags for multiple values.
 6. For search and publish style commands, pass explicit boolean text such as `true` or `false`.
-7. Return the JSON result and call out created or updated IDs in the final reply.
+7. For document vector search, remind the user that results depend on documents already having embeddings on the server side.
+8. Return the JSON result and call out created or updated IDs in the final reply.
 
 ## Common Commands
 
@@ -156,6 +157,13 @@ python3 skills/revornix-publisher/scripts/revornix_api.py search-mine-documents 
   --keyword notes \
   --label 10 \
   --desc true
+```
+
+Search documents by vector similarity:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py search-document-vector \
+  --query "向量数据库与检索增强生成"
 ```
 
 Update document metadata:

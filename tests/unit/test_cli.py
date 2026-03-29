@@ -356,6 +356,40 @@ def test_search_mine_documents_cli_passes_filters(monkeypatch):
     assert DummySession.payload.desc is False
 
 
+def test_search_document_vector_cli_passes_query(monkeypatch):
+    class DummySession:
+        payload: ClassVar[DocumentSchema.VectorSearchRequest | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def search_document_vector(self, data):
+            DummySession.payload = data
+            return {"documents": [{"id": 8, "title": "Semantic Notes"}]}
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "documents",
+            "search-vector",
+            "--query",
+            "semantic retrieval",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert DummySession.payload is not None
+    assert DummySession.payload.query == "semantic retrieval"
+    assert json.loads(result.stdout) == {"documents": [{"id": 8, "title": "Semantic Notes"}]}
+
+
 def test_update_section_cli_passes_optional_fields(monkeypatch):
     class DummySession:
         payload: ClassVar[SectionSchema.SectionUpdateRequest | None] = None
@@ -443,4 +477,3 @@ def test_publish_section_cli_passes_status(monkeypatch):
     assert DummySession.payload is not None
     assert DummySession.payload.section_id == 12
     assert DummySession.payload.status is True
-

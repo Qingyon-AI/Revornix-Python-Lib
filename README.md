@@ -167,6 +167,12 @@ Search my documents:
 revornix documents search-mine --keyword notes --label 10 --desc true
 ```
 
+Run document vector search:
+
+```shell
+revornix documents search-vector --query "retrieval augmented generation"
+```
+
 Create a section:
 
 ```shell
@@ -300,6 +306,12 @@ revornix documents search-mine \
   --desc true
 ```
 
+Run document vector search:
+
+```shell
+revornix documents search-vector --query "retrieval augmented generation"
+```
+
 #### `labels`
 
 List document labels:
@@ -411,6 +423,7 @@ revornix sections republish --section-id 12
 - `--section` and `--label` expect numeric IDs.
 - CLI responses are printed as JSON.
 - `documents upload-create-file` and `documents upload-create-audio` upload the local file first, then create the corresponding document.
+- `documents search-vector` requires the target documents to already have embeddings generated on the server side.
 Example:
 
 ```shell
@@ -644,6 +657,21 @@ data = DocumentSchema.AudioDocumentParameters(
 res = session.create_audio_document(data=data)
 ```
 
+### Run Document Vector Search
+
+```python
+from revornix import Session
+from revornix.schema import DocumentSchema
+
+session = Session(
+    base_url="YOUR_API_PREFIX",
+    api_key="YOUR_API_KEY",
+)
+
+data = DocumentSchema.VectorSearchRequest(query="retrieval augmented generation")
+res = session.search_document_vector(data=data)
+```
+
 ## Available SDK Methods
 
 The current `Session` methods are:
@@ -659,6 +687,7 @@ The current `Session` methods are:
 - `get_document_detail`
 - `update_document`
 - `search_mine_documents`
+- `search_document_vector`
 - `create_section_label`
 - `get_mine_all_section_labels`
 - `delete_section_label`

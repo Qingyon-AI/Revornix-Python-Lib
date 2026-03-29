@@ -6,3 +6,4 @@ class DocumentApi:
     get_document_detail = "/tp/document/detail"
     update_document = "/tp/document/update"
     search_mine_documents = "/tp/document/search/mine"
+    search_document_vector = "/tp/document/vector/search"

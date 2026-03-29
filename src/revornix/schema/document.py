@@ -99,6 +99,10 @@ class DocumentDetailRequest(BaseModel):
     document_id: int
 
 
+class VectorSearchRequest(BaseModel):
+    query: str
+
+
 class WebsiteDocumentInfo(BaseModel):
     url: str
 
@@ -163,3 +167,7 @@ class DocumentDetailResponse(BaseModel):
     summarize_task: DocumentSummarizeTask | None = None
     transcribe_task: DocumentTranscribeTask | None = None
     process_task: DocumentProcessTask | None = None
+
+
+class VectorSearchResponse(BaseModel):
+    documents: list[DocumentInfo] = Field(default_factory=list)

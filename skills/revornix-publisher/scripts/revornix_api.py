@@ -19,6 +19,7 @@ DELETE_DOCUMENT_LABEL_ENDPOINT = "/tp/document/label/delete"
 DOCUMENT_DETAIL_ENDPOINT = "/tp/document/detail"
 UPDATE_DOCUMENT_ENDPOINT = "/tp/document/update"
 SEARCH_MINE_DOCUMENTS_ENDPOINT = "/tp/document/search/mine"
+SEARCH_DOCUMENT_VECTOR_ENDPOINT = "/tp/document/vector/search"
 
 LIST_SECTIONS_ENDPOINT = "/tp/section/mine/all"
 CREATE_SECTION_LABEL_ENDPOINT = "/tp/section/label/create"
@@ -197,6 +198,12 @@ def parse_args() -> argparse.Namespace:
     search_mine_documents_parser.add_argument("--limit", type=int, default=10)
     search_mine_documents_parser.add_argument("--label", action="append", type=int)
     search_mine_documents_parser.add_argument("--desc", type=parse_bool, default=True)
+
+    search_document_vector_parser = subparsers.add_parser(
+        "search-document-vector",
+        help="Run semantic vector search across my documents.",
+    )
+    search_document_vector_parser.add_argument("--query", required=True)
 
     upload_and_create_file_parser = subparsers.add_parser(
         "upload-and-create-file-document",
@@ -422,6 +429,15 @@ def search_mine_documents(base_url: str, api_key: str, args: argparse.Namespace)
     return post_json(base_url, api_key, SEARCH_MINE_DOCUMENTS_ENDPOINT, payload)
 
 
+def search_document_vector(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    return post_json(
+        base_url,
+        api_key,
+        SEARCH_DOCUMENT_VECTOR_ENDPOINT,
+        {"query": args.query},
+    )
+
+
 def upload_and_create_file_document(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
     local_path = Path(args.local_file_path).expanduser().resolve()
     remote_file_path = args.remote_file_path or local_path.name
@@ -611,6 +627,8 @@ def main() -> None:
         result = update_document(base_url, api_key, args)
     elif args.command == "search-mine-documents":
         result = search_mine_documents(base_url, api_key, args)
+    elif args.command == "search-document-vector":
+        result = search_document_vector(base_url, api_key, args)
     elif args.command == "upload-and-create-file-document":
         result = upload_and_create_file_document(base_url, api_key, args)
     elif args.command == "upload-and-create-audio-document":

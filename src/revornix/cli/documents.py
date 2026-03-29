@@ -349,3 +349,13 @@ def search_mine_documents(
         desc=parse_bool(desc),
     )
     handle_api_call(lambda: session.search_mine_documents(payload))
+
+
+@app.command("search-vector")
+def search_document_vector(
+    ctx: typer.Context,
+    query: Annotated[str, typer.Option(..., "--query", help="Semantic query text.")],
+) -> None:
+    session = session_from_context(ctx)
+    payload = DocumentSchema.VectorSearchRequest(query=query)
+    handle_api_call(lambda: session.search_document_vector(payload))

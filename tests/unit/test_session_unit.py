@@ -173,3 +173,44 @@ def test_publish_section_posts_payload_and_returns_success_response():
     ]
     assert result.success is True
     assert result.code == 200
+
+
+def test_search_document_vector_posts_query_and_parses_documents():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/document/vector/search": {
+                "documents": [
+                    {
+                        "id": 1,
+                        "creator_id": 2,
+                        "category": 2,
+                        "title": "Vector Search Note",
+                        "from_plat": "api",
+                        "create_time": "2026-03-27T12:00:00",
+                        "update_time": None,
+                        "labels": [{"id": 10, "name": "research"}],
+                        "sections": [{"id": 99, "title": "notes", "description": "demo"}],
+                        "users": [],
+                    }
+                ]
+            }
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    result = session.search_document_vector(
+        DocumentSchema.VectorSearchRequest(query="semantic retrieval")
+    )
+
+    assert dummy_client.calls == [
+        {
+            "endpoint": "/tp/document/vector/search",
+            "json": {"query": "semantic retrieval"},
+            "files": None,
+            "data": None,
+        }
+    ]
+    assert len(result.documents) == 1
+    assert result.documents[0].title == "Vector Search Note"
+    assert result.documents[0].labels[0].name == "research"

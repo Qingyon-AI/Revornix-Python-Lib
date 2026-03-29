@@ -167,6 +167,12 @@ revornix documents detail --document-id 123
 revornix documents search-mine --keyword notes --label 10 --desc true
 ```
 
+执行文档向量检索：
+
+```shell
+revornix documents search-vector --query "检索增强生成"
+```
+
 创建专栏：
 
 ```shell
@@ -300,6 +306,12 @@ revornix documents search-mine \
   --desc true
 ```
 
+执行文档向量检索：
+
+```shell
+revornix documents search-vector --query "检索增强生成"
+```
+
 #### `labels`
 
 列出文档标签：
@@ -411,6 +423,7 @@ revornix sections republish --section-id 12
 - `--section` 和 `--label` 都要求传数值 ID
 - CLI 响应会以 JSON 输出
 - `documents upload-create-file` 和 `documents upload-create-audio` 会先上传本地文件，再创建对应文档
+- `documents search-vector` 依赖服务端已为目标文档生成 embedding
 示例：
 
 ```shell
@@ -644,6 +657,21 @@ data = DocumentSchema.AudioDocumentParameters(
 res = session.create_audio_document(data=data)
 ```
 
+### 执行文档向量检索
+
+```python
+from revornix import Session
+from revornix.schema import DocumentSchema
+
+session = Session(
+    base_url="YOUR_API_PREFIX",
+    api_key="YOUR_API_KEY",
+)
+
+data = DocumentSchema.VectorSearchRequest(query="检索增强生成")
+res = session.search_document_vector(data=data)
+```
+
 ## 可用的 SDK 方法
 
 当前 `Session` 提供的方法有：
@@ -659,6 +687,7 @@ res = session.create_audio_document(data=data)
 - `get_document_detail`
 - `update_document`
 - `search_mine_documents`
+- `search_document_vector`
 - `create_section_label`
 - `get_mine_all_section_labels`
 - `delete_section_label`

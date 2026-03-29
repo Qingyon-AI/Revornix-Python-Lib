@@ -158,6 +158,16 @@ class Session:
             data,
         )
 
+    def search_document_vector(
+        self,
+        data: DocumentSchema.VectorSearchRequest,
+    ) -> DocumentSchema.VectorSearchResponse:
+        return self._post_json(
+            DocumentApi.search_document_vector,
+            DocumentSchema.VectorSearchResponse,
+            data,
+        )
+
     def create_section_label(
         self,
         data: SectionSchema.LabelAddRequest,
