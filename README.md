@@ -173,6 +173,24 @@ Run document vector search:
 revornix documents search-vector --query "retrieval augmented generation"
 ```
 
+Ask document AI and manage reading state:
+
+```shell
+revornix documents ask --document-id 123 --question "Summarize the key decisions"
+revornix documents read --document-id 123 --status true
+revornix documents star --document-id 123 --status true
+```
+
+Work with notes, task generation, and graphs:
+
+```shell
+revornix documents create-note --document-id 123 --content "Follow up next week"
+revornix documents generate-graph --document-id 123
+revornix documents generate-podcast --document-id 123
+revornix graphs document --document-id 123
+revornix graphs section --section-id 12
+```
+
 Create a section:
 
 ```shell
@@ -727,10 +745,26 @@ The current `Session` methods are:
 - `create_document_label`
 - `delete_document_label`
 - `get_document_detail`
+- `ask_document`
+- `create_document_ai_summary`
+- `create_document_embedding`
+- `transcribe_audio_document`
+- `generate_document_graph`
+- `generate_document_podcast`
+- `get_document_month_summary`
+- `create_document_note`
+- `search_document_notes`
+- `delete_document_notes`
 - `update_document`
+- `transform_document_markdown`
 - `delete_document`
 - `search_mine_documents`
+- `search_unread_documents`
+- `search_recent_documents`
+- `search_star_documents`
 - `search_document_vector`
+- `set_document_read_status`
+- `set_document_star_status`
 - `create_section_label`
 - `get_mine_all_section_labels`
 - `delete_section_label`
@@ -739,11 +773,22 @@ The current `Session` methods are:
 - `delete_section`
 - `get_section_detail`
 - `get_section_documents`
+- `ask_section`
 - `get_mine_all_sections`
 - `search_mine_sections`
+- `search_subscribed_sections`
+- `search_public_sections`
+- `search_user_sections`
+- `generate_section_podcast`
+- `generate_section_ppt`
+- `trigger_section_process`
+- `retry_section_document`
 - `publish_section`
 - `get_section_publish`
 - `republish_section`
+- `search_graph`
+- `search_document_graph`
+- `search_section_graph`
 
 ## Development
 

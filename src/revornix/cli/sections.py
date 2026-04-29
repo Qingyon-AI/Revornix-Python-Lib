@@ -10,6 +10,7 @@ from revornix.cli.shared import (
     parse_bool,
     parse_optional_bool,
     session_from_context,
+    user_message,
 )
 
 
@@ -96,6 +97,24 @@ def get_section_documents(
     handle_api_call(lambda: session.get_section_documents(payload))
 
 
+@app.command("ask")
+def ask_section(
+    ctx: typer.Context,
+    section_id: Annotated[int, typer.Option(..., "--section-id", help="Section id.")],
+    question: Annotated[str, typer.Option(..., "--question", help="Question to ask the section AI.")],
+    enable_mcp: Annotated[bool, typer.Option("--enable-mcp")] = False,
+    model_id: Annotated[int | None, typer.Option("--model-id")] = None,
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.SectionAskRequest(
+        section_id=section_id,
+        messages=user_message(question),
+        enable_mcp=enable_mcp,
+        model_id=model_id,
+    )
+    handle_api_call(lambda: session.ask_section(payload))
+
+
 @app.command("search-mine")
 def search_mine_sections(
     ctx: typer.Context,
@@ -117,6 +136,77 @@ def search_mine_sections(
         desc=parse_bool(desc),
     )
     handle_api_call(lambda: session.search_mine_sections(payload))
+
+
+@app.command("search-subscribed")
+def search_subscribed_sections(
+    ctx: typer.Context,
+    labels: Annotated[
+        list[int] | None,
+        typer.Option("--label", help="Label id. Repeat the option for multiple values."),
+    ] = None,
+    keyword: Annotated[str | None, typer.Option("--keyword")] = None,
+    start: Annotated[int | None, typer.Option("--start")] = None,
+    limit: Annotated[int, typer.Option("--limit")] = 10,
+    desc: Annotated[str, typer.Option("--desc", help="Sort descending: true or false.")] = "true",
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.SearchSubscribedSectionRequest(
+        keyword=keyword,
+        start=start,
+        limit=limit,
+        label_ids=optional_ids(labels),
+        desc=parse_bool(desc),
+    )
+    handle_api_call(lambda: session.search_subscribed_sections(payload))
+
+
+@app.command("search-public")
+def search_public_sections(
+    ctx: typer.Context,
+    labels: Annotated[
+        list[int] | None,
+        typer.Option("--label", help="Label id. Repeat the option for multiple values."),
+    ] = None,
+    keyword: Annotated[str | None, typer.Option("--keyword")] = None,
+    start: Annotated[int | None, typer.Option("--start")] = None,
+    limit: Annotated[int, typer.Option("--limit")] = 10,
+    desc: Annotated[str, typer.Option("--desc", help="Sort descending: true or false.")] = "true",
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.SearchPublicSectionsRequest(
+        keyword=keyword,
+        start=start,
+        limit=limit,
+        label_ids=optional_ids(labels),
+        desc=parse_bool(desc),
+    )
+    handle_api_call(lambda: session.search_public_sections(payload))
+
+
+@app.command("search-user")
+def search_user_sections(
+    ctx: typer.Context,
+    user_id: Annotated[int, typer.Option(..., "--user-id", help="User id.")],
+    labels: Annotated[
+        list[int] | None,
+        typer.Option("--label", help="Label id. Repeat the option for multiple values."),
+    ] = None,
+    keyword: Annotated[str | None, typer.Option("--keyword")] = None,
+    start: Annotated[int | None, typer.Option("--start")] = None,
+    limit: Annotated[int, typer.Option("--limit")] = 10,
+    desc: Annotated[str, typer.Option("--desc", help="Sort descending: true or false.")] = "true",
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.SearchUserSectionsRequest(
+        user_id=user_id,
+        keyword=keyword,
+        start=start,
+        limit=limit,
+        label_ids=optional_ids(labels),
+        desc=parse_bool(desc),
+    )
+    handle_api_call(lambda: session.search_user_sections(payload))
 
 
 @app.command("update")
@@ -198,3 +288,59 @@ def republish_section(
     session = session_from_context(ctx)
     payload = SectionSchema.SectionRePublishRequest(section_id=section_id)
     handle_api_call(lambda: session.republish_section(payload))
+
+
+@app.command("generate-podcast")
+def generate_section_podcast(
+    ctx: typer.Context,
+    section_id: Annotated[int, typer.Option(..., "--section-id", help="Section id.")],
+    engine_id: Annotated[int | None, typer.Option("--engine-id")] = None,
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.GenerateSectionPodcastRequest(section_id=section_id, engine_id=engine_id)
+    handle_api_call(lambda: session.generate_section_podcast(payload))
+
+
+@app.command("generate-ppt")
+def generate_section_ppt(
+    ctx: typer.Context,
+    section_id: Annotated[int, typer.Option(..., "--section-id", help="Section id.")],
+    model_id: Annotated[int | None, typer.Option("--model-id")] = None,
+    image_engine_id: Annotated[int | None, typer.Option("--image-engine-id")] = None,
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.GenerateSectionPptRequest(
+        section_id=section_id,
+        model_id=model_id,
+        image_engine_id=image_engine_id,
+    )
+    handle_api_call(lambda: session.generate_section_ppt(payload))
+
+
+@app.command("trigger-process")
+def trigger_section_process(
+    ctx: typer.Context,
+    section_id: Annotated[int, typer.Option(..., "--section-id", help="Section id.")],
+    model_id: Annotated[int | None, typer.Option("--model-id")] = None,
+    image_engine_id: Annotated[int | None, typer.Option("--image-engine-id")] = None,
+    podcast_engine_id: Annotated[int | None, typer.Option("--podcast-engine-id")] = None,
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.TriggerSectionProcessRequest(
+        section_id=section_id,
+        model_id=model_id,
+        image_engine_id=image_engine_id,
+        podcast_engine_id=podcast_engine_id,
+    )
+    handle_api_call(lambda: session.trigger_section_process(payload))
+
+
+@app.command("retry-document")
+def retry_section_document(
+    ctx: typer.Context,
+    section_id: Annotated[int, typer.Option(..., "--section-id", help="Section id.")],
+    document_id: Annotated[int, typer.Option(..., "--document-id", help="Document id.")],
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.RetrySectionDocumentRequest(section_id=section_id, document_id=document_id)
+    handle_api_call(lambda: session.retry_section_document(payload))

@@ -1,4 +1,5 @@
 import json
+from uuid import uuid4
 from dataclasses import dataclass
 from typing import Any
 
@@ -7,6 +8,7 @@ import typer
 from pydantic import BaseModel
 
 from revornix.session import Session
+from revornix.schema.ai import ChatItem
 
 
 @dataclass(slots=True)
@@ -90,3 +92,13 @@ def parse_optional_bool(value: str | None) -> bool | None:
     if value is None:
         return None
     return parse_bool(value)
+
+
+def user_message(content: str) -> list[ChatItem]:
+    return [
+        ChatItem(
+            chat_id=str(uuid4()),
+            role="user",
+            content=content,
+        )
+    ]

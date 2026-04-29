@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from revornix.schema.ai import ChatItem
 from revornix.schema.task import SectionPodcastTask, SectionProcessTask
 from revornix.schema.user import UserPublicInfo
 
@@ -67,6 +68,68 @@ class SearchMineSectionsRequest(BaseModel):
     desc: bool = True
 
 
+class SearchSubscribedSectionRequest(SearchMineSectionsRequest):
+    pass
+
+
+class SearchPublicSectionsRequest(SearchMineSectionsRequest):
+    pass
+
+
+class SearchUserSectionsRequest(SearchMineSectionsRequest):
+    user_id: int
+
+
+class SectionAskRequest(BaseModel):
+    section_id: int
+    messages: list[ChatItem]
+    enable_mcp: bool = False
+    model_id: int | None = None
+
+
+class GenerateSectionPodcastRequest(BaseModel):
+    section_id: int
+    engine_id: int | None = None
+
+
+class GenerateSectionPptRequest(BaseModel):
+    section_id: int
+    model_id: int | None = None
+    image_engine_id: int | None = None
+
+
+class TriggerSectionProcessRequest(BaseModel):
+    section_id: int
+    model_id: int | None = None
+    image_engine_id: int | None = None
+    podcast_engine_id: int | None = None
+
+
+class RetrySectionDocumentRequest(BaseModel):
+    section_id: int
+    document_id: int
+
+
+class SectionPptSlide(BaseModel):
+    id: str
+    title: str
+    summary: str
+    prompt: str
+    image_url: str | None = None
+
+
+class SectionPptPreview(BaseModel):
+    status: str
+    title: str | None = None
+    subtitle: str | None = None
+    theme_prompt: str | None = None
+    pptx_url: str | None = None
+    error_message: str | None = None
+    create_time: datetime | None = None
+    update_time: datetime | None = None
+    slides: list[SectionPptSlide] = Field(default_factory=list)
+
+
 class SectionPublishRequest(BaseModel):
     section_id: int
     status: bool
@@ -128,8 +191,12 @@ class SectionInfo(BaseModel):
     podcast_task: SectionPodcastTask | None = None
     process_task: SectionProcessTask | None = None
     document_integration: SectionDocumentIntegrationSummary | None = None
+    graph_stale: bool | None = None
     process_task_trigger_type: int | None = None
     process_task_trigger_scheduler: str | None = None
+    is_day_section: bool = False
+    day_section_date: str | None = None
+    ppt_preview: SectionPptPreview | None = None
 
 
 class SectionCreateRequest(BaseModel):

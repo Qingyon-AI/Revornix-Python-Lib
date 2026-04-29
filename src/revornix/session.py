@@ -6,10 +6,12 @@ from pydantic import BaseModel
 
 import revornix.schema.common as CommonSchema
 import revornix.schema.document as DocumentSchema
+import revornix.schema.graph as GraphSchema
 import revornix.schema.pagination as PaginationSchema
 import revornix.schema.section as SectionSchema
 from revornix.endpoints.document import DocumentApi
 from revornix.endpoints.file import FileApi
+from revornix.endpoints.graph import GraphApi
 from revornix.endpoints.section import SectionApi
 
 
@@ -44,6 +46,19 @@ class Session:
             response = self.httpx_client.post(endpoint, json=json_payload)
         response.raise_for_status()
         return response_model.model_validate(response.json())
+
+    def _post_json_raw(
+        self,
+        endpoint: str,
+        payload: BaseModel | dict | None = None,
+    ) -> dict:
+        if payload is None:
+            response = self.httpx_client.post(endpoint)
+        else:
+            json_payload = payload.model_dump(exclude_none=True) if isinstance(payload, BaseModel) else payload
+            response = self.httpx_client.post(endpoint, json=json_payload)
+        response.raise_for_status()
+        return response.json()
 
     def _create_document(
         self,
@@ -137,6 +152,64 @@ class Session:
             data,
         )
 
+    def ask_document(
+        self,
+        data: DocumentSchema.DocumentAskRequest,
+    ) -> dict:
+        return self._post_json_raw(DocumentApi.ask_document, data)
+
+    def create_document_ai_summary(
+        self,
+        data: DocumentSchema.DocumentTaskRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.create_ai_summary, CommonSchema.NormalResponse, data)
+
+    def create_document_embedding(
+        self,
+        data: DocumentSchema.DocumentTaskRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.create_embedding, CommonSchema.NormalResponse, data)
+
+    def transcribe_audio_document(
+        self,
+        data: DocumentSchema.DocumentEngineTaskRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.transcribe_audio, CommonSchema.NormalResponse, data)
+
+    def generate_document_graph(
+        self,
+        data: DocumentSchema.DocumentTaskRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.generate_graph, CommonSchema.NormalResponse, data)
+
+    def generate_document_podcast(
+        self,
+        data: DocumentSchema.DocumentEngineTaskRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.generate_podcast, CommonSchema.NormalResponse, data)
+
+    def get_document_month_summary(self) -> DocumentSchema.DocumentMonthSummaryResponse:
+        return self._post_json(DocumentApi.month_summary, DocumentSchema.DocumentMonthSummaryResponse)
+
+    def create_document_note(
+        self,
+        data: DocumentSchema.DocumentNoteCreateRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.create_note, CommonSchema.NormalResponse, data)
+
+    def search_document_notes(
+        self,
+        data: DocumentSchema.SearchDocumentNoteRequest,
+    ) -> PaginationSchema.InfiniteScrollPagination[DocumentSchema.DocumentNoteInfo]:
+        response_model = PaginationSchema.InfiniteScrollPagination[DocumentSchema.DocumentNoteInfo]
+        return self._post_json(DocumentApi.search_notes, response_model, data)
+
+    def delete_document_notes(
+        self,
+        data: DocumentSchema.DocumentNoteDeleteRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.delete_notes, CommonSchema.NormalResponse, data)
+
     def update_document(
         self,
         data: DocumentSchema.DocumentUpdateRequest,
@@ -146,6 +219,12 @@ class Session:
             CommonSchema.NormalResponse,
             data,
         )
+
+    def transform_document_markdown(
+        self,
+        data: DocumentSchema.DocumentMarkdownConvertRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.transform_markdown, CommonSchema.NormalResponse, data)
 
     def delete_document(
         self,
@@ -168,6 +247,27 @@ class Session:
             data,
         )
 
+    def search_unread_documents(
+        self,
+        data: DocumentSchema.SearchAllMyDocumentsRequest,
+    ) -> PaginationSchema.InfiniteScrollPagination[DocumentSchema.DocumentInfo]:
+        response_model = PaginationSchema.InfiniteScrollPagination[DocumentSchema.DocumentInfo]
+        return self._post_json(DocumentApi.search_unread_documents, response_model, data)
+
+    def search_recent_documents(
+        self,
+        data: DocumentSchema.SearchAllMyDocumentsRequest,
+    ) -> PaginationSchema.InfiniteScrollPagination[DocumentSchema.DocumentInfo]:
+        response_model = PaginationSchema.InfiniteScrollPagination[DocumentSchema.DocumentInfo]
+        return self._post_json(DocumentApi.search_recent_documents, response_model, data)
+
+    def search_star_documents(
+        self,
+        data: DocumentSchema.SearchAllMyDocumentsRequest,
+    ) -> PaginationSchema.InfiniteScrollPagination[DocumentSchema.DocumentInfo]:
+        response_model = PaginationSchema.InfiniteScrollPagination[DocumentSchema.DocumentInfo]
+        return self._post_json(DocumentApi.search_star_documents, response_model, data)
+
     def search_document_vector(
         self,
         data: DocumentSchema.VectorSearchRequest,
@@ -177,6 +277,18 @@ class Session:
             DocumentSchema.VectorSearchResponse,
             data,
         )
+
+    def set_document_read_status(
+        self,
+        data: DocumentSchema.ReadRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.read_document, CommonSchema.NormalResponse, data)
+
+    def set_document_star_status(
+        self,
+        data: DocumentSchema.StarRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.star_document, CommonSchema.NormalResponse, data)
 
     def create_section_label(
         self,
@@ -255,6 +367,12 @@ class Session:
             data,
         )
 
+    def ask_section(
+        self,
+        data: SectionSchema.SectionAskRequest,
+    ) -> dict:
+        return self._post_json_raw(SectionApi.ask_section, data)
+
     def get_mine_all_sections(self) -> SectionSchema.AllMySectionsResponse:
         return self._post_json(
             SectionApi.get_mine_all_section,
@@ -271,6 +389,51 @@ class Session:
             response_model,
             data,
         )
+
+    def search_subscribed_sections(
+        self,
+        data: SectionSchema.SearchSubscribedSectionRequest,
+    ) -> PaginationSchema.InfiniteScrollPagination[SectionSchema.SectionInfo]:
+        response_model = PaginationSchema.InfiniteScrollPagination[SectionSchema.SectionInfo]
+        return self._post_json(SectionApi.search_subscribed_sections, response_model, data)
+
+    def search_public_sections(
+        self,
+        data: SectionSchema.SearchPublicSectionsRequest,
+    ) -> PaginationSchema.InfiniteScrollPagination[SectionSchema.SectionInfo]:
+        response_model = PaginationSchema.InfiniteScrollPagination[SectionSchema.SectionInfo]
+        return self._post_json(SectionApi.search_public_sections, response_model, data)
+
+    def search_user_sections(
+        self,
+        data: SectionSchema.SearchUserSectionsRequest,
+    ) -> PaginationSchema.InfiniteScrollPagination[SectionSchema.SectionInfo]:
+        response_model = PaginationSchema.InfiniteScrollPagination[SectionSchema.SectionInfo]
+        return self._post_json(SectionApi.search_user_sections, response_model, data)
+
+    def generate_section_podcast(
+        self,
+        data: SectionSchema.GenerateSectionPodcastRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(SectionApi.generate_podcast, CommonSchema.NormalResponse, data)
+
+    def generate_section_ppt(
+        self,
+        data: SectionSchema.GenerateSectionPptRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(SectionApi.generate_ppt, CommonSchema.NormalResponse, data)
+
+    def trigger_section_process(
+        self,
+        data: SectionSchema.TriggerSectionProcessRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(SectionApi.trigger_process, CommonSchema.NormalResponse, data)
+
+    def retry_section_document(
+        self,
+        data: SectionSchema.RetrySectionDocumentRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(SectionApi.retry_document, CommonSchema.NormalResponse, data)
 
     def publish_section(
         self,
@@ -301,3 +464,18 @@ class Session:
             CommonSchema.NormalResponse,
             data,
         )
+
+    def search_graph(self) -> GraphSchema.GraphResponse:
+        return self._post_json(GraphApi.search_graph, GraphSchema.GraphResponse)
+
+    def search_document_graph(
+        self,
+        data: GraphSchema.DocumentGraphRequest,
+    ) -> GraphSchema.GraphResponse:
+        return self._post_json(GraphApi.document_graph, GraphSchema.GraphResponse, data)
+
+    def search_section_graph(
+        self,
+        data: GraphSchema.SectionGraphRequest,
+    ) -> GraphSchema.GraphResponse:
+        return self._post_json(GraphApi.section_graph, GraphSchema.GraphResponse, data)

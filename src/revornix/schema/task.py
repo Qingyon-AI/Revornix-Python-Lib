@@ -31,6 +31,7 @@ class DocumentProcessTask(BaseModel):
 class DocumentPodcastTask(BaseModel):
     status: int
     podcast_file_name: str | None = None
+    podcast_script_file_name: str | None = None
 
 
 class SectionPodcastTask(BaseModel):

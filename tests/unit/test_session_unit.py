@@ -2,6 +2,7 @@ from typing import cast
 
 import httpx
 import revornix.schema.document as DocumentSchema
+import revornix.schema.graph as GraphSchema
 import revornix.schema.section as SectionSchema
 from revornix.session import Session
 
@@ -272,3 +273,90 @@ def test_search_document_vector_posts_query_and_parses_documents():
     assert len(result.documents) == 1
     assert result.documents[0].title == "Vector Search Note"
     assert result.documents[0].labels[0].name == "research"
+
+
+def test_document_ai_and_status_methods_post_expected_payloads():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/document/ask": {"answer": "hello"},
+            "/tp/document/read": {"success": True, "message": "Success", "code": 200},
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    ask_result = session.ask_document(
+        DocumentSchema.DocumentAskRequest(
+            document_id=7,
+            messages=[
+                DocumentSchema.ChatItem(
+                    chat_id="chat-1",
+                    role="user",
+                    content="Summarize this",
+                )
+            ],
+            enable_mcp=True,
+            model_id=3,
+        )
+    )
+    read_result = session.set_document_read_status(
+        DocumentSchema.ReadRequest(document_id=7, status=True)
+    )
+
+    assert ask_result == {"answer": "hello"}
+    assert read_result.success is True
+    assert dummy_client.calls == [
+        {
+            "endpoint": "/tp/document/ask",
+            "json": {
+                "document_id": 7,
+                "messages": [
+                    {
+                        "chat_id": "chat-1",
+                        "content": "Summarize this",
+                        "role": "user",
+                        "images": [],
+                    }
+                ],
+                "enable_mcp": True,
+                "model_id": 3,
+            },
+            "files": None,
+            "data": None,
+        },
+        {
+            "endpoint": "/tp/document/read",
+            "json": {"document_id": 7, "status": True},
+            "files": None,
+            "data": None,
+        },
+    ]
+
+
+def test_graph_methods_parse_graph_response():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/graph/document": {
+                "nodes": [
+                    {
+                        "id": "n1",
+                        "text": "Revornix",
+                        "degree": 2,
+                        "sources": [{"doc_id": 7, "doc_title": "Demo", "chunk_id": "c1"}],
+                    }
+                ],
+                "edges": [{"src_node": "n1", "tgt_node": "n2"}],
+            }
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    result = session.search_document_graph(
+        GraphSchema.DocumentGraphRequest(document_id=7)
+    )
+
+    assert dummy_client.calls[0]["endpoint"] == "/tp/graph/document"
+    assert dummy_client.calls[0]["json"] == {"document_id": 7}
+    assert result.nodes[0].sources[0].doc_title == "Demo"
+    assert result.edges[0].tgt_node == "n2"

@@ -4,6 +4,7 @@ import typer
 
 from revornix.cli.documents import app as documents_app
 from revornix.cli.files import app as files_app
+from revornix.cli.graphs import app as graphs_app
 from revornix.cli.labels import app as labels_app
 from revornix.cli.sections import app as sections_app
 from revornix.cli.shared import AppConfig
@@ -18,6 +19,7 @@ app.add_typer(files_app, name="files")
 app.add_typer(documents_app, name="documents")
 app.add_typer(labels_app, name="labels")
 app.add_typer(sections_app, name="sections")
+app.add_typer(graphs_app, name="graphs")
 
 
 @app.callback()

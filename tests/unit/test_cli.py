@@ -4,6 +4,7 @@ from typing import ClassVar
 from click.testing import CliRunner
 import revornix.schema.common as CommonSchema
 import revornix.schema.document as DocumentSchema
+import revornix.schema.graph as GraphSchema
 import revornix.schema.section as SectionSchema
 from typer.main import get_command
 
@@ -72,8 +73,8 @@ def test_create_quick_note_cli_rejects_legacy_env_aliases():
             "hello from cli",
         ],
         env={
-            "REVORNIX_URL_PREFIX": "https://api.example.com",
-            "API_KEY": "secret-token",
+            "REVORNIX_BASE_URL": "",
+            "REVORNIX_API_KEY": "",
         },
     )
 
@@ -547,3 +548,78 @@ def test_publish_section_cli_passes_status(monkeypatch):
     assert DummySession.payload is not None
     assert DummySession.payload.section_id == 12
     assert DummySession.payload.status is True
+
+
+def test_ask_document_cli_builds_user_message(monkeypatch):
+    class DummySession:
+        payload: ClassVar[DocumentSchema.DocumentAskRequest | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def ask_document(self, data):
+            DummySession.payload = data
+            return {"answer": "ok"}
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "documents",
+            "ask",
+            "--document-id",
+            "9",
+            "--question",
+            "What is this about?",
+            "--enable-mcp",
+            "--model-id",
+            "3",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert DummySession.payload is not None
+    assert DummySession.payload.document_id == 9
+    assert DummySession.payload.enable_mcp is True
+    assert DummySession.payload.model_id == 3
+    assert DummySession.payload.messages[0].role == "user"
+    assert DummySession.payload.messages[0].content == "What is this about?"
+
+
+def test_graph_document_cli_passes_document_id(monkeypatch):
+    class DummySession:
+        payload: ClassVar[GraphSchema.DocumentGraphRequest | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def search_document_graph(self, data):
+            DummySession.payload = data
+            return {"nodes": [], "edges": []}
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "graphs",
+            "document",
+            "--document-id",
+            "77",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert DummySession.payload is not None
+    assert DummySession.payload.document_id == 77

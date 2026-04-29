@@ -1,7 +1,7 @@
 ---
 name: revornix-publisher
-description: Create, search, inspect, update, delete, publish, and organize Revornix sections, labels, and documents from OpenClaw. Use when the user asks to create Revornix 专栏 or section, 标签 or label, quick note, website document, file document, audio document, upload files, inspect document or section detail, search mine documents or sections, run document vector search, update or delete metadata objects, or publish or republish sections in Revornix.
-version: 1.2.0
+description: Create, search, inspect, update, delete, publish, and organize Revornix sections, labels, documents, notes, AI tasks, reading states, and knowledge graphs from OpenClaw. Use when the user asks to create Revornix 专栏 or section, 标签 or label, quick note, website document, file document, audio document, upload files, inspect document or section detail, ask document or section AI, search mine/unread/recent/starred documents, search sections, run vector or graph search, update or delete metadata objects, trigger summaries/embeddings/transcription/podcast/PPT/graph/process tasks, or publish or republish sections in Revornix.
+version: 1.3.0
 metadata:
   openclaw:
     requires:
@@ -37,7 +37,7 @@ If the skill is installed under a different root, keep using the bundled script 
 
 ## Workflow
 
-1. Determine whether the user wants to list, inspect, create, update, delete, search, vector-search, publish, or republish.
+1. Determine whether the user wants to list, inspect, create, update, delete, search, vector-search, graph-search, ask AI, set read/star state, manage notes, trigger processing tasks, publish, or republish.
 2. Resolve section IDs and label IDs before creating or updating documents when the user only provides names.
 3. Prefer listing existing sections or labels before creating new ones when duplication is possible.
 4. For file and audio documents:
@@ -46,7 +46,7 @@ If the skill is installed under a different root, keep using the bundled script 
 5. Use repeated `--section`, `--label`, or `--label-id` flags for multiple values.
    Use repeated `--document-id` flags when deleting multiple documents.
 6. For search and publish style commands, pass explicit boolean text such as `true` or `false`.
-7. For document vector search, remind the user that results depend on documents already having embeddings on the server side.
+7. For document vector search and graph commands, remind the user that results depend on embeddings or graph tasks already being generated on the server side.
 8. Return the JSON result and call out created or updated IDs in the final reply.
 
 ## Common Commands
@@ -171,6 +171,70 @@ Search documents by vector similarity:
 ```bash
 python3 skills/revornix-publisher/scripts/revornix_api.py search-document-vector \
   --query "向量数据库与检索增强生成"
+```
+
+Ask document or section AI:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py ask-document \
+  --document-id 123 \
+  --question "Summarize the key decisions"
+
+python3 skills/revornix-publisher/scripts/revornix_api.py ask-section \
+  --section-id 12 \
+  --question "What themes connect these documents?"
+```
+
+Search unread, recent, or starred documents:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py search-unread-documents --limit 10
+python3 skills/revornix-publisher/scripts/revornix_api.py search-recent-documents --keyword architecture
+python3 skills/revornix-publisher/scripts/revornix_api.py search-star-documents --label 10
+```
+
+Set read or star status:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py read-document --document-id 123 --status true
+python3 skills/revornix-publisher/scripts/revornix_api.py star-document --document-id 123 --status true
+```
+
+Manage document notes:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py create-document-note \
+  --document-id 123 \
+  --content "Follow up next week"
+python3 skills/revornix-publisher/scripts/revornix_api.py search-document-notes --document-id 123
+python3 skills/revornix-publisher/scripts/revornix_api.py delete-document-notes --note-id 45
+```
+
+Trigger document tasks:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py create-document-summary --document-id 123
+python3 skills/revornix-publisher/scripts/revornix_api.py create-document-embedding --document-id 123
+python3 skills/revornix-publisher/scripts/revornix_api.py generate-document-graph --document-id 123
+python3 skills/revornix-publisher/scripts/revornix_api.py transcribe-document --document-id 123
+python3 skills/revornix-publisher/scripts/revornix_api.py generate-document-podcast --document-id 123
+```
+
+Search graphs:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py search-graph
+python3 skills/revornix-publisher/scripts/revornix_api.py document-graph --document-id 123
+python3 skills/revornix-publisher/scripts/revornix_api.py section-graph --section-id 12
+```
+
+Trigger section tasks:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py generate-section-podcast --section-id 12
+python3 skills/revornix-publisher/scripts/revornix_api.py generate-section-ppt --section-id 12
+python3 skills/revornix-publisher/scripts/revornix_api.py trigger-section-process --section-id 12
+python3 skills/revornix-publisher/scripts/revornix_api.py retry-section-document --section-id 12 --document-id 123
 ```
 
 Update document metadata:
