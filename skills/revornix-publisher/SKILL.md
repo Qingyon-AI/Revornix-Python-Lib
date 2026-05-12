@@ -1,7 +1,7 @@
 ---
 name: revornix-publisher
-description: Create, search, inspect, update, delete, publish, and organize Revornix sections, labels, documents, notes, AI tasks, reading states, and knowledge graphs from OpenClaw. Use when the user asks to create Revornix 专栏 or section, 标签 or label, quick note, website document, file document, audio document, upload files, inspect document or section detail, ask document or section AI, search mine/unread/recent/starred documents, search sections, run vector or graph search, update or delete metadata objects, trigger summaries/embeddings/transcription/podcast/PPT/graph/process tasks, or publish or republish sections in Revornix.
-version: 1.3.0
+description: Create, search, inspect, update, delete, publish, comment on, and organize Revornix sections, day sections, labels, documents, notes, AI tasks, reading states, and knowledge graphs from OpenClaw. Use when the user asks to create Revornix 专栏 or section, 标签 or label, quick note, website document, file document, audio document, upload files, inspect document or section detail, ask document or section AI, search mine/unread/recent/starred documents, search sections, manage section comments, run vector or graph search, update or delete metadata objects, trigger summaries/embeddings/transcription/podcast/PPT/graph/process tasks, or publish or republish documents or sections in Revornix.
+version: 1.4.0
 metadata:
   openclaw:
     requires:
@@ -63,6 +63,12 @@ Get section detail:
 python3 skills/revornix-publisher/scripts/revornix_api.py section-detail --section-id 12
 ```
 
+Get day section info:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py section-date --date 2026-05-13
+```
+
 Search my sections:
 
 ```bash
@@ -116,6 +122,16 @@ Republish a section:
 python3 skills/revornix-publisher/scripts/revornix_api.py republish-section --section-id 12
 ```
 
+Manage section comments:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py create-section-comment \
+  --section-id 12 \
+  --content "Great update"
+python3 skills/revornix-publisher/scripts/revornix_api.py search-section-comments --section-id 12
+python3 skills/revornix-publisher/scripts/revornix_api.py delete-section-comments --comment-id 45
+```
+
 List document labels:
 
 ```bash
@@ -155,6 +171,7 @@ Get document detail:
 
 ```bash
 python3 skills/revornix-publisher/scripts/revornix_api.py document-detail --document-id 123
+python3 skills/revornix-publisher/scripts/revornix_api.py document-detail --url https://example.com/article
 ```
 
 Search my documents:
@@ -170,7 +187,9 @@ Search documents by vector similarity:
 
 ```bash
 python3 skills/revornix-publisher/scripts/revornix_api.py search-document-vector \
-  --query "向量数据库与检索增强生成"
+  --query "向量数据库与检索增强生成" \
+  --mode vector \
+  --limit 10
 ```
 
 Ask document or section AI:
@@ -198,6 +217,13 @@ Set read or star status:
 ```bash
 python3 skills/revornix-publisher/scripts/revornix_api.py read-document --document-id 123 --status true
 python3 skills/revornix-publisher/scripts/revornix_api.py star-document --document-id 123 --status true
+```
+
+Publish or unpublish a document:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py publish-document --document-id 123 --status true
+python3 skills/revornix-publisher/scripts/revornix_api.py get-document-publish --document-id 123
 ```
 
 Manage document notes:

@@ -17,6 +17,8 @@ class DocumentApi:
     search_unread_documents = "/tp/document/unread/search"
     search_recent_documents = "/tp/document/recent/search"
     update_document = "/tp/document/update"
+    publish_document = "/tp/document/publish"
+    get_document_publish = "/tp/document/publish/get"
     transform_markdown = "/tp/document/markdown/transform"
     delete_document = "/tp/document/delete"
     search_star_documents = "/tp/document/star/search"

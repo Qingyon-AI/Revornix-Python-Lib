@@ -9,6 +9,7 @@ from revornix.cli.shared import (
     normalize_ids,
     optional_ids,
     parse_bool,
+    parse_optional_bool,
     session_from_context,
     user_message,
 )
@@ -294,10 +295,11 @@ def upload_and_create_audio_document(
 @app.command("detail")
 def get_document_detail(
     ctx: typer.Context,
-    document_id: Annotated[int, typer.Option(..., "--document-id", help="Document id.")],
+    document_id: Annotated[int | None, typer.Option("--document-id", help="Document id.")] = None,
+    url: Annotated[str | None, typer.Option("--url", help="Website document URL.")] = None,
 ) -> None:
     session = session_from_context(ctx)
-    payload = DocumentSchema.DocumentDetailRequest(document_id=document_id)
+    payload = DocumentSchema.DocumentDetailRequest(document_id=document_id, url=url)
     handle_api_call(lambda: session.get_document_detail(payload))
 
 
@@ -308,6 +310,7 @@ def ask_document(
     question: Annotated[str, typer.Option(..., "--question", help="Question to ask the document AI.")],
     enable_mcp: Annotated[bool, typer.Option("--enable-mcp")] = False,
     model_id: Annotated[int | None, typer.Option("--model-id")] = None,
+    assistant_chat_id: Annotated[str | None, typer.Option("--assistant-chat-id")] = None,
 ) -> None:
     session = session_from_context(ctx)
     payload = DocumentSchema.DocumentAskRequest(
@@ -315,6 +318,7 @@ def ask_document(
         messages=user_message(question),
         enable_mcp=enable_mcp,
         model_id=model_id,
+        assistant_chat_id=assistant_chat_id,
     )
     handle_api_call(lambda: session.ask_document(payload))
 
@@ -335,6 +339,7 @@ def update_document(
     description: Annotated[str | None, typer.Option("--description")] = None,
     cover: Annotated[str | None, typer.Option("--cover")] = None,
     content: Annotated[str | None, typer.Option("--content")] = None,
+    is_public: Annotated[str | None, typer.Option("--is-public", help="Set public status to true or false.")] = None,
 ) -> None:
     session = session_from_context(ctx)
     payload = DocumentSchema.DocumentUpdateRequest(
@@ -345,6 +350,7 @@ def update_document(
         content=content,
         labels=optional_ids(labels),
         sections=optional_ids(sections),
+        is_public=parse_optional_bool(is_public),
     )
     handle_api_call(lambda: session.update_document(payload))
 
@@ -360,6 +366,27 @@ def delete_document(
     session = session_from_context(ctx)
     payload = DocumentSchema.DocumentDeleteRequest(document_ids=list(document_ids))
     handle_api_call(lambda: session.delete_document(payload))
+
+
+@app.command("publish")
+def publish_document(
+    ctx: typer.Context,
+    document_id: Annotated[int, typer.Option(..., "--document-id", help="Document id.")],
+    status: Annotated[str, typer.Option(..., "--status", help="Publish status: true or false.")],
+) -> None:
+    session = session_from_context(ctx)
+    payload = DocumentSchema.DocumentPublishRequest(document_id=document_id, status=parse_bool(status))
+    handle_api_call(lambda: session.publish_document(payload))
+
+
+@app.command("get-publish")
+def get_document_publish(
+    ctx: typer.Context,
+    document_id: Annotated[int, typer.Option(..., "--document-id", help="Document id.")],
+) -> None:
+    session = session_from_context(ctx)
+    payload = DocumentSchema.DocumentPublishGetRequest(document_id=document_id)
+    handle_api_call(lambda: session.get_document_publish(payload))
 
 
 def _search_request(
@@ -450,9 +477,11 @@ def search_star_documents(
 def search_document_vector(
     ctx: typer.Context,
     query: Annotated[str, typer.Option(..., "--query", help="Semantic query text.")],
+    mode: Annotated[str, typer.Option("--mode", help="Search mode: vector or text.")] = "vector",
+    limit: Annotated[int, typer.Option("--limit")] = 10,
 ) -> None:
     session = session_from_context(ctx)
-    payload = DocumentSchema.VectorSearchRequest(query=query)
+    payload = DocumentSchema.VectorSearchRequest(query=query, mode=mode, limit=limit)
     handle_api_call(lambda: session.search_document_vector(payload))
 
 

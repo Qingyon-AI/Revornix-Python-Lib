@@ -85,6 +85,7 @@ class SectionAskRequest(BaseModel):
     messages: list[ChatItem]
     enable_mcp: bool = False
     model_id: int | None = None
+    assistant_chat_id: str | None = None
 
 
 class GenerateSectionPodcastRequest(BaseModel):
@@ -164,6 +165,40 @@ class SectionDocumentInfo(BaseModel):
     update_time: datetime | None = None
 
 
+class SectionCommentInfo(BaseModel):
+    id: int
+    content: str
+    create_time: datetime
+    update_time: datetime | None = None
+    creator: UserPublicInfo
+    parent_id: int | None = None
+    root_id: int | None = None
+    reply_user: UserPublicInfo | None = None
+    like_count: int = 0
+    liked: bool = False
+    reply_count: int = 0
+    preview_replies: list["SectionCommentInfo"] = Field(default_factory=list)
+
+
+class SectionCommentCreateRequest(BaseModel):
+    content: str
+    section_id: int
+    parent_id: int | None = None
+
+
+class SectionCommentSearchRequest(BaseModel):
+    section_id: int
+    start: int | None = None
+    limit: int = 10
+    keyword: str | None = None
+    sort: str = "time"
+    preview_reply_limit: int = 2
+
+
+class SectionCommentDeleteRequest(BaseModel):
+    section_comment_ids: list[int]
+
+
 class SectionDocumentIntegrationSummary(BaseModel):
     wait_to_count: int = 0
     supplementing_count: int = 0
@@ -221,7 +256,31 @@ class SectionUpdateRequest(BaseModel):
     description: str | None = None
     cover: str | None = None
     labels: list[int] | None = None
+    is_public: bool | None = None
     auto_podcast: bool | None = None
     auto_illustration: bool | None = None
     process_task_trigger_type: int | None = None
     process_task_trigger_scheduler: str | None = None
+
+
+class DaySectionRequest(BaseModel):
+    date: str
+
+
+class DaySectionResponse(BaseModel):
+    section_id: int | None = None
+    creator: UserPublicInfo | None = None
+    date: str
+    title: str | None = None
+    description: str | None = None
+    auto_podcast: bool = True
+    auto_illustration: bool = True
+    create_time: datetime | None = None
+    update_time: datetime | None = None
+    md_file_name: str | None = None
+    documents: list[SectionDocumentInfo] = Field(default_factory=list)
+    podcast_task: SectionPodcastTask | None = None
+    process_task: SectionProcessTask | None = None
+    process_task_trigger_type: int | None = None
+    process_task_trigger_scheduler: str | None = None
+    is_created: bool = True

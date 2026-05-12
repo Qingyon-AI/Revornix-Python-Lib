@@ -30,6 +30,8 @@ DELETE_DOCUMENT_NOTES_ENDPOINT = "/tp/document/note/delete"
 SEARCH_UNREAD_DOCUMENTS_ENDPOINT = "/tp/document/unread/search"
 SEARCH_RECENT_DOCUMENTS_ENDPOINT = "/tp/document/recent/search"
 UPDATE_DOCUMENT_ENDPOINT = "/tp/document/update"
+PUBLISH_DOCUMENT_ENDPOINT = "/tp/document/publish"
+GET_DOCUMENT_PUBLISH_ENDPOINT = "/tp/document/publish/get"
 TRANSFORM_DOCUMENT_MARKDOWN_ENDPOINT = "/tp/document/markdown/transform"
 DELETE_DOCUMENT_ENDPOINT = "/tp/document/delete"
 SEARCH_STAR_DOCUMENTS_ENDPOINT = "/tp/document/star/search"
@@ -46,8 +48,12 @@ CREATE_SECTION_ENDPOINT = "/tp/section/create"
 UPDATE_SECTION_ENDPOINT = "/tp/section/update"
 DELETE_SECTION_ENDPOINT = "/tp/section/delete"
 SECTION_DETAIL_ENDPOINT = "/tp/section/detail"
+SECTION_DATE_ENDPOINT = "/tp/section/date"
 SECTION_DOCUMENTS_ENDPOINT = "/tp/section/documents"
 ASK_SECTION_ENDPOINT = "/tp/section/ask"
+CREATE_SECTION_COMMENT_ENDPOINT = "/tp/section/comment/create"
+SEARCH_SECTION_COMMENTS_ENDPOINT = "/tp/section/comment/search"
+DELETE_SECTION_COMMENTS_ENDPOINT = "/tp/section/comment/delete"
 SEARCH_SUBSCRIBED_SECTIONS_ENDPOINT = "/tp/section/subscribed"
 SEARCH_PUBLIC_SECTIONS_ENDPOINT = "/tp/section/public/search"
 SEARCH_USER_SECTIONS_ENDPOINT = "/tp/section/user/search"
@@ -112,6 +118,7 @@ def parse_args() -> argparse.Namespace:
     update_section_parser.add_argument("--description", default=None)
     update_section_parser.add_argument("--cover", default=None)
     update_section_parser.add_argument("--label", action="append", type=int)
+    update_section_parser.add_argument("--is-public", type=parse_bool, default=None)
     update_section_parser.add_argument("--auto-podcast", type=parse_bool, default=None)
     update_section_parser.add_argument("--auto-illustration", type=parse_bool, default=None)
     update_section_parser.add_argument("--process-task-trigger-type", type=int, default=None)
@@ -122,6 +129,9 @@ def parse_args() -> argparse.Namespace:
 
     section_detail_parser = subparsers.add_parser("section-detail", help="Get section detail.")
     section_detail_parser.add_argument("--section-id", required=True, type=int)
+
+    section_date_parser = subparsers.add_parser("section-date", help="Get day section info.")
+    section_date_parser.add_argument("--date", required=True)
 
     section_documents_parser = subparsers.add_parser("section-documents", help="List section documents.")
     section_documents_parser.add_argument("--section-id", required=True, type=int)
@@ -135,6 +145,23 @@ def parse_args() -> argparse.Namespace:
     ask_section_parser.add_argument("--question", required=True)
     ask_section_parser.add_argument("--enable-mcp", action="store_true")
     ask_section_parser.add_argument("--model-id", type=int, default=None)
+    ask_section_parser.add_argument("--assistant-chat-id", default=None)
+
+    create_section_comment_parser = subparsers.add_parser("create-section-comment", help="Create a section comment.")
+    create_section_comment_parser.add_argument("--section-id", required=True, type=int)
+    create_section_comment_parser.add_argument("--content", required=True)
+    create_section_comment_parser.add_argument("--parent-id", type=int, default=None)
+
+    search_section_comments_parser = subparsers.add_parser("search-section-comments", help="Search section comments.")
+    search_section_comments_parser.add_argument("--section-id", required=True, type=int)
+    search_section_comments_parser.add_argument("--keyword", default=None)
+    search_section_comments_parser.add_argument("--start", type=int, default=None)
+    search_section_comments_parser.add_argument("--limit", type=int, default=10)
+    search_section_comments_parser.add_argument("--sort", default="time")
+    search_section_comments_parser.add_argument("--preview-reply-limit", type=int, default=2)
+
+    delete_section_comments_parser = subparsers.add_parser("delete-section-comments", help="Delete section comments.")
+    delete_section_comments_parser.add_argument("--comment-id", action="append", type=int, required=True)
 
     search_mine_sections_parser = subparsers.add_parser(
         "search-mine-sections",
@@ -229,13 +256,15 @@ def parse_args() -> argparse.Namespace:
     create_audio_parser.add_argument("--auto-transcribe", action="store_true")
 
     document_detail_parser = subparsers.add_parser("document-detail", help="Get document detail.")
-    document_detail_parser.add_argument("--document-id", required=True, type=int)
+    document_detail_parser.add_argument("--document-id", type=int, default=None)
+    document_detail_parser.add_argument("--url", default=None)
 
     ask_document_parser = subparsers.add_parser("ask-document", help="Ask document AI.")
     ask_document_parser.add_argument("--document-id", required=True, type=int)
     ask_document_parser.add_argument("--question", required=True)
     ask_document_parser.add_argument("--enable-mcp", action="store_true")
     ask_document_parser.add_argument("--model-id", type=int, default=None)
+    ask_document_parser.add_argument("--assistant-chat-id", default=None)
 
     update_document_parser = subparsers.add_parser("update-document", help="Update document metadata.")
     update_document_parser.add_argument("--document-id", required=True, type=int)
@@ -245,9 +274,17 @@ def parse_args() -> argparse.Namespace:
     update_document_parser.add_argument("--content", default=None)
     update_document_parser.add_argument("--section", action="append", type=int)
     update_document_parser.add_argument("--label", action="append", type=int)
+    update_document_parser.add_argument("--is-public", type=parse_bool, default=None)
 
     delete_document_parser = subparsers.add_parser("delete-document", help="Delete documents.")
     delete_document_parser.add_argument("--document-id", action="append", type=int, required=True)
+
+    publish_document_parser = subparsers.add_parser("publish-document", help="Publish or unpublish a document.")
+    publish_document_parser.add_argument("--document-id", required=True, type=int)
+    publish_document_parser.add_argument("--status", required=True, type=parse_bool)
+
+    get_document_publish_parser = subparsers.add_parser("get-document-publish", help="Get document publish status.")
+    get_document_publish_parser.add_argument("--document-id", required=True, type=int)
 
     search_mine_documents_parser = subparsers.add_parser(
         "search-mine-documents",
@@ -272,6 +309,8 @@ def parse_args() -> argparse.Namespace:
         help="Run semantic vector search across my documents.",
     )
     search_document_vector_parser.add_argument("--query", required=True)
+    search_document_vector_parser.add_argument("--mode", choices=["vector", "text"], default="vector")
+    search_document_vector_parser.add_argument("--limit", type=int, default=10)
 
     for command_name, help_text in [
         ("read-document", "Set document read status."),
@@ -520,7 +559,7 @@ def build_document_payload(args: argparse.Namespace, category: int) -> dict:
 
 
 def build_user_chat_payload(args: argparse.Namespace, target_key: str) -> dict:
-    return {
+    payload = {
         target_key: getattr(args, target_key),
         "messages": [
             {
@@ -532,7 +571,9 @@ def build_user_chat_payload(args: argparse.Namespace, target_key: str) -> dict:
         ],
         "enable_mcp": args.enable_mcp,
         "model_id": args.model_id,
+        "assistant_chat_id": getattr(args, "assistant_chat_id", None),
     }
+    return {key: value for key, value in payload.items() if value is not None}
 
 
 def build_search_payload(args: argparse.Namespace) -> dict:
@@ -572,7 +613,11 @@ def create_audio_document(base_url: str, api_key: str, args: argparse.Namespace)
 
 
 def get_document_detail(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
-    return post_json(base_url, api_key, DOCUMENT_DETAIL_ENDPOINT, {"document_id": args.document_id})
+    if args.document_id is None and not args.url:
+        raise SystemExit("Either --document-id or --url is required.")
+    payload = {"document_id": args.document_id, "url": args.url}
+    payload = {key: value for key, value in payload.items() if value is not None}
+    return post_json(base_url, api_key, DOCUMENT_DETAIL_ENDPOINT, payload)
 
 
 def ask_document(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
@@ -588,6 +633,7 @@ def update_document(base_url: str, api_key: str, args: argparse.Namespace) -> di
         "content": args.content,
         "sections": args.section,
         "labels": args.label,
+        "is_public": args.is_public,
     }
     payload = {key: value for key, value in payload.items() if value is not None}
     return post_json(base_url, api_key, UPDATE_DOCUMENT_ENDPOINT, payload)
@@ -599,6 +645,24 @@ def delete_document(base_url: str, api_key: str, args: argparse.Namespace) -> di
         api_key,
         DELETE_DOCUMENT_ENDPOINT,
         {"document_ids": args.document_id},
+    )
+
+
+def document_publish(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    return post_json(
+        base_url,
+        api_key,
+        PUBLISH_DOCUMENT_ENDPOINT,
+        {"document_id": args.document_id, "status": args.status},
+    )
+
+
+def get_document_publish(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    return post_json(
+        base_url,
+        api_key,
+        GET_DOCUMENT_PUBLISH_ENDPOINT,
+        {"document_id": args.document_id},
     )
 
 
@@ -615,7 +679,7 @@ def search_document_vector(base_url: str, api_key: str, args: argparse.Namespace
         base_url,
         api_key,
         SEARCH_DOCUMENT_VECTOR_ENDPOINT,
-        {"query": args.query},
+        {"query": args.query, "mode": args.mode, "limit": args.limit},
     )
 
 
@@ -719,6 +783,7 @@ def update_section(base_url: str, api_key: str, args: argparse.Namespace) -> dic
         "description": args.description,
         "cover": args.cover,
         "labels": args.label,
+        "is_public": args.is_public,
         "auto_podcast": args.auto_podcast,
         "auto_illustration": args.auto_illustration,
         "process_task_trigger_type": args.process_task_trigger_type,
@@ -736,6 +801,10 @@ def get_section_detail(base_url: str, api_key: str, args: argparse.Namespace) ->
     return post_json(base_url, api_key, SECTION_DETAIL_ENDPOINT, {"section_id": args.section_id})
 
 
+def get_section_date(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    return post_json(base_url, api_key, SECTION_DATE_ENDPOINT, {"date": args.date})
+
+
 def get_section_documents(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
     payload = {
         "section_id": args.section_id,
@@ -750,6 +819,38 @@ def get_section_documents(base_url: str, api_key: str, args: argparse.Namespace)
 
 def ask_section(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
     return post_json(base_url, api_key, ASK_SECTION_ENDPOINT, build_user_chat_payload(args, "section_id"))
+
+
+def create_section_comment(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    payload = {
+        "section_id": args.section_id,
+        "content": args.content,
+        "parent_id": args.parent_id,
+    }
+    payload = {key: value for key, value in payload.items() if value is not None}
+    return post_json(base_url, api_key, CREATE_SECTION_COMMENT_ENDPOINT, payload)
+
+
+def search_section_comments(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    payload = {
+        "section_id": args.section_id,
+        "keyword": args.keyword,
+        "start": args.start,
+        "limit": args.limit,
+        "sort": args.sort,
+        "preview_reply_limit": args.preview_reply_limit,
+    }
+    payload = {key: value for key, value in payload.items() if value is not None}
+    return post_json(base_url, api_key, SEARCH_SECTION_COMMENTS_ENDPOINT, payload)
+
+
+def delete_section_comments(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    return post_json(
+        base_url,
+        api_key,
+        DELETE_SECTION_COMMENTS_ENDPOINT,
+        {"section_comment_ids": args.comment_id},
+    )
 
 
 def search_mine_sections(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
@@ -864,10 +965,18 @@ def main() -> None:
         result = delete_section(base_url, api_key, args)
     elif args.command == "section-detail":
         result = get_section_detail(base_url, api_key, args)
+    elif args.command == "section-date":
+        result = get_section_date(base_url, api_key, args)
     elif args.command == "section-documents":
         result = get_section_documents(base_url, api_key, args)
     elif args.command == "ask-section":
         result = ask_section(base_url, api_key, args)
+    elif args.command == "create-section-comment":
+        result = create_section_comment(base_url, api_key, args)
+    elif args.command == "search-section-comments":
+        result = search_section_comments(base_url, api_key, args)
+    elif args.command == "delete-section-comments":
+        result = delete_section_comments(base_url, api_key, args)
     elif args.command == "search-mine-sections":
         result = search_mine_sections(base_url, api_key, args)
     elif args.command == "search-subscribed-sections":
@@ -916,6 +1025,10 @@ def main() -> None:
         result = update_document(base_url, api_key, args)
     elif args.command == "delete-document":
         result = delete_document(base_url, api_key, args)
+    elif args.command == "publish-document":
+        result = document_publish(base_url, api_key, args)
+    elif args.command == "get-document-publish":
+        result = get_document_publish(base_url, api_key, args)
     elif args.command == "search-mine-documents":
         result = search_mine_documents(base_url, api_key, args)
     elif args.command == "search-unread-documents":

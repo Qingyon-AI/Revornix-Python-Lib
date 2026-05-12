@@ -77,6 +77,16 @@ def get_section_detail(
     handle_api_call(lambda: session.get_section_detail(payload))
 
 
+@app.command("date")
+def get_section_date(
+    ctx: typer.Context,
+    date: Annotated[str, typer.Option(..., "--date", help="Day section date, formatted as YYYY-MM-DD.")],
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.DaySectionRequest(date=date)
+    handle_api_call(lambda: session.get_section_date(payload))
+
+
 @app.command("documents")
 def get_section_documents(
     ctx: typer.Context,
@@ -104,6 +114,7 @@ def ask_section(
     question: Annotated[str, typer.Option(..., "--question", help="Question to ask the section AI.")],
     enable_mcp: Annotated[bool, typer.Option("--enable-mcp")] = False,
     model_id: Annotated[int | None, typer.Option("--model-id")] = None,
+    assistant_chat_id: Annotated[str | None, typer.Option("--assistant-chat-id")] = None,
 ) -> None:
     session = session_from_context(ctx)
     payload = SectionSchema.SectionAskRequest(
@@ -111,8 +122,60 @@ def ask_section(
         messages=user_message(question),
         enable_mcp=enable_mcp,
         model_id=model_id,
+        assistant_chat_id=assistant_chat_id,
     )
     handle_api_call(lambda: session.ask_section(payload))
+
+
+@app.command("create-comment")
+def create_section_comment(
+    ctx: typer.Context,
+    section_id: Annotated[int, typer.Option(..., "--section-id", help="Section id.")],
+    content: Annotated[str, typer.Option(..., "--content", help="Comment content.")],
+    parent_id: Annotated[int | None, typer.Option("--parent-id")] = None,
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.SectionCommentCreateRequest(
+        section_id=section_id,
+        content=content,
+        parent_id=parent_id,
+    )
+    handle_api_call(lambda: session.create_section_comment(payload))
+
+
+@app.command("search-comments")
+def search_section_comments(
+    ctx: typer.Context,
+    section_id: Annotated[int, typer.Option(..., "--section-id", help="Section id.")],
+    keyword: Annotated[str | None, typer.Option("--keyword")] = None,
+    start: Annotated[int | None, typer.Option("--start")] = None,
+    limit: Annotated[int, typer.Option("--limit")] = 10,
+    sort: Annotated[str, typer.Option("--sort", help="Sort mode: time or hot.")] = "time",
+    preview_reply_limit: Annotated[int, typer.Option("--preview-reply-limit")] = 2,
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.SectionCommentSearchRequest(
+        section_id=section_id,
+        keyword=keyword,
+        start=start,
+        limit=limit,
+        sort=sort,
+        preview_reply_limit=preview_reply_limit,
+    )
+    handle_api_call(lambda: session.search_section_comments(payload))
+
+
+@app.command("delete-comments")
+def delete_section_comments(
+    ctx: typer.Context,
+    comment_ids: Annotated[
+        list[int],
+        typer.Option("--comment-id", help="Section comment id. Repeat the option for multiple values."),
+    ],
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.SectionCommentDeleteRequest(section_comment_ids=list(comment_ids))
+    handle_api_call(lambda: session.delete_section_comments(payload))
 
 
 @app.command("search-mine")
@@ -220,6 +283,7 @@ def update_section(
     title: Annotated[str | None, typer.Option("--title")] = None,
     description: Annotated[str | None, typer.Option("--description")] = None,
     cover: Annotated[str | None, typer.Option("--cover")] = None,
+    is_public: Annotated[str | None, typer.Option("--is-public", help="Set public status to true or false.")] = None,
     auto_podcast: Annotated[
         str | None,
         typer.Option("--auto-podcast", help="Set auto podcast to true or false."),
@@ -241,6 +305,7 @@ def update_section(
         description=description,
         cover=cover,
         labels=optional_ids(labels),
+        is_public=parse_optional_bool(is_public),
         auto_podcast=parse_optional_bool(auto_podcast),
         auto_illustration=parse_optional_bool(auto_illustration),
         process_task_trigger_type=process_task_trigger_type,

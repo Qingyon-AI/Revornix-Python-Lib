@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from revornix.schema.ai import ChatItem
 from revornix.schema.task import (
@@ -87,6 +87,7 @@ class DocumentUpdateRequest(BaseModel):
     labels: list[int] | None = None
     sections: list[int] | None = None
     content: str | None = None
+    is_public: bool | None = None
 
 
 class SearchAllMyDocumentsRequest(BaseModel):
@@ -102,11 +103,20 @@ class DocumentDeleteRequest(BaseModel):
 
 
 class DocumentDetailRequest(BaseModel):
-    document_id: int
+    document_id: int | None = None
+    url: str | None = None
+
+    @model_validator(mode="after")
+    def validate_document_identifier(self):
+        if self.document_id is None and (self.url is None or len(self.url.strip()) == 0):
+            raise ValueError("Either document_id or url is required")
+        return self
 
 
 class VectorSearchRequest(BaseModel):
     query: str
+    mode: str = "vector"
+    limit: int = 10
 
 
 class DocumentAskRequest(BaseModel):
@@ -114,6 +124,7 @@ class DocumentAskRequest(BaseModel):
     messages: list[ChatItem]
     enable_mcp: bool = False
     model_id: int | None = None
+    assistant_chat_id: str | None = None
 
 
 class DocumentTaskRequest(BaseModel):
@@ -128,6 +139,21 @@ class DocumentEngineTaskRequest(BaseModel):
 
 class DocumentMarkdownConvertRequest(BaseModel):
     document_id: int
+
+
+class DocumentPublishRequest(BaseModel):
+    document_id: int
+    status: bool
+
+
+class DocumentPublishGetRequest(BaseModel):
+    document_id: int
+
+
+class DocumentPublishGetResponse(BaseModel):
+    status: bool
+    create_time: datetime | None = None
+    update_time: datetime | None = None
 
 
 class DocumentNoteCreateRequest(BaseModel):
@@ -237,6 +263,7 @@ class DocumentDetailResponse(BaseModel):
 
 class VectorSearchResponse(BaseModel):
     documents: list[DocumentInfo] = Field(default_factory=list)
+    snippets: dict[int, str] = Field(default_factory=dict)
 
 
 class DocumentNoteInfo(BaseModel):

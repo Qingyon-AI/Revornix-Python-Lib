@@ -226,6 +226,22 @@ class Session:
     ) -> CommonSchema.NormalResponse:
         return self._post_json(DocumentApi.transform_markdown, CommonSchema.NormalResponse, data)
 
+    def publish_document(
+        self,
+        data: DocumentSchema.DocumentPublishRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(DocumentApi.publish_document, CommonSchema.NormalResponse, data)
+
+    def get_document_publish(
+        self,
+        data: DocumentSchema.DocumentPublishGetRequest,
+    ) -> DocumentSchema.DocumentPublishGetResponse:
+        return self._post_json(
+            DocumentApi.get_document_publish,
+            DocumentSchema.DocumentPublishGetResponse,
+            data,
+        )
+
     def delete_document(
         self,
         data: DocumentSchema.DocumentDeleteRequest,
@@ -356,6 +372,16 @@ class Session:
             data,
         )
 
+    def get_section_date(
+        self,
+        data: SectionSchema.DaySectionRequest,
+    ) -> SectionSchema.DaySectionResponse:
+        return self._post_json(
+            SectionApi.get_section_date,
+            SectionSchema.DaySectionResponse,
+            data,
+        )
+
     def get_section_documents(
         self,
         data: SectionSchema.SectionDocumentRequest,
@@ -372,6 +398,25 @@ class Session:
         data: SectionSchema.SectionAskRequest,
     ) -> dict:
         return self._post_json_raw(SectionApi.ask_section, data)
+
+    def create_section_comment(
+        self,
+        data: SectionSchema.SectionCommentCreateRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(SectionApi.create_comment, CommonSchema.NormalResponse, data)
+
+    def search_section_comments(
+        self,
+        data: SectionSchema.SectionCommentSearchRequest,
+    ) -> PaginationSchema.InfiniteScrollPagination[SectionSchema.SectionCommentInfo]:
+        response_model = PaginationSchema.InfiniteScrollPagination[SectionSchema.SectionCommentInfo]
+        return self._post_json(SectionApi.search_comments, response_model, data)
+
+    def delete_section_comments(
+        self,
+        data: SectionSchema.SectionCommentDeleteRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(SectionApi.delete_comments, CommonSchema.NormalResponse, data)
 
     def get_mine_all_sections(self) -> SectionSchema.AllMySectionsResponse:
         return self._post_json(

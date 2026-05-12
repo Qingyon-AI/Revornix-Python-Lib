@@ -234,6 +234,127 @@ def test_publish_section_posts_payload_and_returns_success_response():
     assert result.code == 200
 
 
+def test_publish_document_posts_payload_and_returns_success_response():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/document/publish": {
+                "success": True,
+                "message": "Success",
+                "code": 200,
+            }
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    result = session.publish_document(
+        DocumentSchema.DocumentPublishRequest(document_id=7, status=True)
+    )
+
+    assert dummy_client.calls == [
+        {
+            "endpoint": "/tp/document/publish",
+            "json": {"document_id": 7, "status": True},
+            "files": None,
+            "data": None,
+        }
+    ]
+    assert result.success is True
+    assert result.code == 200
+
+
+def test_get_section_date_posts_payload_and_parses_response():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/section/date": {
+                "section_id": 17,
+                "creator": None,
+                "date": "2026-05-13",
+                "title": "Daily",
+                "description": None,
+                "auto_podcast": True,
+                "auto_illustration": True,
+                "create_time": None,
+                "update_time": None,
+                "md_file_name": None,
+                "documents": [],
+                "podcast_task": None,
+                "process_task": None,
+                "process_task_trigger_type": 1,
+                "process_task_trigger_scheduler": None,
+                "is_created": True,
+            }
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    result = session.get_section_date(SectionSchema.DaySectionRequest(date="2026-05-13"))
+
+    assert dummy_client.calls == [
+        {
+            "endpoint": "/tp/section/date",
+            "json": {"date": "2026-05-13"},
+            "files": None,
+            "data": None,
+        }
+    ]
+    assert result.section_id == 17
+    assert result.date == "2026-05-13"
+
+
+def test_search_section_comments_posts_payload_and_parses_pagination():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/section/comment/search": {
+                "total": 1,
+                "start": None,
+                "limit": 10,
+                "has_more": False,
+                "next_start": None,
+                "elements": [
+                    {
+                        "id": 3,
+                        "content": "Nice",
+                        "create_time": "2026-05-13T08:00:00",
+                        "update_time": None,
+                        "creator": {
+                            "id": 1,
+                            "role": 1,
+                            "avatar": "https://example.com/avatar.png",
+                            "nickname": "kinda",
+                            "slogan": None,
+                        },
+                    }
+                ],
+            }
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    result = session.search_section_comments(
+        SectionSchema.SectionCommentSearchRequest(section_id=7, keyword="Nice")
+    )
+
+    assert dummy_client.calls == [
+        {
+            "endpoint": "/tp/section/comment/search",
+            "json": {
+                "section_id": 7,
+                "limit": 10,
+                "keyword": "Nice",
+                "sort": "time",
+                "preview_reply_limit": 2,
+            },
+            "files": None,
+            "data": None,
+        }
+    ]
+    assert result.total == 1
+    assert result.elements[0].content == "Nice"
+
+
 def test_search_document_vector_posts_query_and_parses_documents():
     session = Session(base_url="https://api.example.com", api_key="secret-token")
     dummy_client = DummyClient(
@@ -265,7 +386,7 @@ def test_search_document_vector_posts_query_and_parses_documents():
     assert dummy_client.calls == [
         {
             "endpoint": "/tp/document/vector/search",
-            "json": {"query": "semantic retrieval"},
+            "json": {"query": "semantic retrieval", "mode": "vector", "limit": 10},
             "files": None,
             "data": None,
         }
