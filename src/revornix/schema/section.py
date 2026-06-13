@@ -143,8 +143,15 @@ class SectionPublishGetRequest(BaseModel):
 class SectionPublishGetResponse(BaseModel):
     status: bool
     uuid: str | None = None
+    has_access_key: bool = False
+    access_key: str | None = None
     create_time: datetime | None = None
     update_time: datetime | None = None
+
+
+class SectionAccessKeyUpdateRequest(BaseModel):
+    section_id: int
+    access_key: str | None = None
 
 
 class SectionRePublishRequest(BaseModel):
@@ -223,6 +230,7 @@ class SectionInfo(BaseModel):
     labels: list[SectionLabel] | None = None
     cover: str | None = None
     publish_uuid: str | None = None
+    has_access_key: bool = False
     podcast_task: SectionPodcastTask | None = None
     process_task: SectionProcessTask | None = None
     document_integration: SectionDocumentIntegrationSummary | None = None
@@ -240,6 +248,7 @@ class SectionCreateRequest(BaseModel):
     cover: str | None = None
     labels: list[int] = Field(default_factory=list)
     auto_publish: bool = False
+    access_key: str | None = None
     auto_podcast: bool = False
     auto_illustration: bool = False
     process_task_trigger_type: int

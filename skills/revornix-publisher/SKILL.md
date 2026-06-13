@@ -1,7 +1,7 @@
 ---
 name: revornix-publisher
 description: Create, search, inspect, update, delete, publish, comment on, and organize Revornix sections, day sections, labels, documents, notes, AI tasks, reading states, and knowledge graphs from OpenClaw. Use when the user asks to create Revornix 专栏 or section, 标签 or label, quick note, website document, file document, audio document, upload files, inspect document or section detail, ask document or section AI, search mine/unread/recent/starred documents, search sections, manage section comments, run vector or graph search, update or delete metadata objects, trigger summaries/embeddings/transcription/podcast/PPT/graph/process tasks, or publish or republish documents or sections in Revornix.
-version: 1.4.0
+version: 1.5.0
 metadata:
   openclaw:
     requires:
@@ -37,7 +37,7 @@ If the skill is installed under a different root, keep using the bundled script 
 
 ## Workflow
 
-1. Determine whether the user wants to list, inspect, create, update, delete, search, vector-search, graph-search, ask AI, set read/star state, manage notes, trigger processing tasks, publish, or republish.
+1. Determine whether the user wants to list, inspect, create, update, delete, search, vector-search, graph-search, ask AI, set read/star state, manage notes, trigger processing tasks, publish, republish, or manage publish access keys.
 2. Resolve section IDs and label IDs before creating or updating documents when the user only provides names.
 3. Prefer listing existing sections or labels before creating new ones when duplication is possible.
 4. For file and audio documents:
@@ -84,7 +84,9 @@ Create a section:
 python3 skills/revornix-publisher/scripts/revornix_api.py create-section \
   --title "AI Notes" \
   --description "Knowledge base for AI" \
-  --process-task-trigger-type 1
+  --process-task-trigger-type 1 \
+  --auto-publish \
+  --access-key section-key
 ```
 
 Update a section:
@@ -114,6 +116,15 @@ Get section publish status:
 
 ```bash
 python3 skills/revornix-publisher/scripts/revornix_api.py get-section-publish --section-id 12
+```
+
+Set or clear a section publish access key:
+
+```bash
+python3 skills/revornix-publisher/scripts/revornix_api.py set-section-publish-access-key \
+  --section-id 12 \
+  --access-key section-key
+python3 skills/revornix-publisher/scripts/revornix_api.py set-section-publish-access-key --section-id 12
 ```
 
 Republish a section:
@@ -164,13 +175,16 @@ Create a quick note document:
 python3 skills/revornix-publisher/scripts/revornix_api.py create-quick-note \
   --content "hello world" \
   --section 1 \
-  --label 10
+  --label 10 \
+  --auto-publish \
+  --access-key open-sesame
 ```
 
 Get document detail:
 
 ```bash
 python3 skills/revornix-publisher/scripts/revornix_api.py document-detail --document-id 123
+python3 skills/revornix-publisher/scripts/revornix_api.py document-detail --uuid doc-pub-uuid --access-key open-sesame
 python3 skills/revornix-publisher/scripts/revornix_api.py document-detail --url https://example.com/article
 ```
 
@@ -224,6 +238,10 @@ Publish or unpublish a document:
 ```bash
 python3 skills/revornix-publisher/scripts/revornix_api.py publish-document --document-id 123 --status true
 python3 skills/revornix-publisher/scripts/revornix_api.py get-document-publish --document-id 123
+python3 skills/revornix-publisher/scripts/revornix_api.py set-document-publish-access-key \
+  --document-id 123 \
+  --access-key open-sesame
+python3 skills/revornix-publisher/scripts/revornix_api.py set-document-publish-access-key --document-id 123
 ```
 
 Manage document notes:
@@ -299,7 +317,8 @@ python3 skills/revornix-publisher/scripts/revornix_api.py upload-and-create-audi
   --remote-file-path uploads/demo.mp3 \
   --section 1 \
   --label 10 \
-  --auto-transcribe
+  --auto-transcribe \
+  --audio-meeting-mode true
 ```
 
 ## Guardrails

@@ -242,6 +242,16 @@ class Session:
             data,
         )
 
+    def update_document_publish_access_key(
+        self,
+        data: DocumentSchema.DocumentAccessKeyUpdateRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(
+            DocumentApi.update_document_publish_access_key,
+            CommonSchema.NormalResponse,
+            data,
+        )
+
     def delete_document(
         self,
         data: DocumentSchema.DocumentDeleteRequest,
@@ -497,6 +507,16 @@ class Session:
         return self._post_json(
             SectionApi.get_section_publish,
             SectionSchema.SectionPublishGetResponse,
+            data,
+        )
+
+    def update_section_publish_access_key(
+        self,
+        data: SectionSchema.SectionAccessKeyUpdateRequest,
+    ) -> CommonSchema.NormalResponse:
+        return self._post_json(
+            SectionApi.update_section_publish_access_key,
+            CommonSchema.NormalResponse,
             data,
         )
 

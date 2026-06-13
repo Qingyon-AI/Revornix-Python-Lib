@@ -60,6 +60,8 @@ class BaseDocumentParameters(BaseModel):
     auto_summary: bool = False
     auto_podcast: bool = False
     auto_tag: bool = False
+    auto_publish: bool = False
+    access_key: str | None = None
 
 
 class FileDocumentParameters(BaseDocumentParameters):
@@ -77,6 +79,7 @@ class QuickNoteDocumentParameters(BaseDocumentParameters):
 class AudioDocumentParameters(BaseDocumentParameters):
     file_name: str | None = None
     auto_transcribe: bool = False
+    audio_meeting_mode: bool | None = None
 
 
 class DocumentUpdateRequest(BaseModel):
@@ -104,12 +107,18 @@ class DocumentDeleteRequest(BaseModel):
 
 class DocumentDetailRequest(BaseModel):
     document_id: int | None = None
+    uuid: str | None = None
     url: str | None = None
+    access_key: str | None = None
 
     @model_validator(mode="after")
     def validate_document_identifier(self):
-        if self.document_id is None and (self.url is None or len(self.url.strip()) == 0):
-            raise ValueError("Either document_id or url is required")
+        if (
+            self.document_id is None
+            and (self.uuid is None or len(self.uuid.strip()) == 0)
+            and (self.url is None or len(self.url.strip()) == 0)
+        ):
+            raise ValueError("Either document_id, uuid or url is required")
         return self
 
 
@@ -152,8 +161,16 @@ class DocumentPublishGetRequest(BaseModel):
 
 class DocumentPublishGetResponse(BaseModel):
     status: bool
+    uuid: str | None = None
+    has_access_key: bool = False
+    access_key: str | None = None
     create_time: datetime | None = None
     update_time: datetime | None = None
+
+
+class DocumentAccessKeyUpdateRequest(BaseModel):
+    document_id: int
+    access_key: str | None = None
 
 
 class DocumentNoteCreateRequest(BaseModel):
@@ -207,11 +224,15 @@ class QuickNoteDocumentInfo(BaseModel):
 
 class AudioDocumentInfo(BaseModel):
     audio_file_name: str
+    meeting_mode: bool = False
+    speaker_map: dict[str, str] | None = None
 
 
 class DocumentInfo(BaseModel):
     id: int
+    publish_uuid: str | None = None
     creator_id: int
+    creator: UserPublicInfo | None = None
     category: int
     title: str
     from_plat: str
@@ -233,6 +254,8 @@ class DocumentInfo(BaseModel):
 
 class DocumentDetailResponse(BaseModel):
     id: int
+    publish_uuid: str | None = None
+    has_access_key: bool = False
     category: int
     title: str
     from_plat: str

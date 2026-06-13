@@ -49,6 +49,10 @@ def create_section(
         typer.Option("--process-task-trigger-scheduler"),
     ] = None,
     auto_publish: Annotated[bool, typer.Option("--auto-publish")] = False,
+    access_key: Annotated[
+        str | None,
+        typer.Option("--access-key", help="Optional access key when auto publishing."),
+    ] = None,
     auto_podcast: Annotated[bool, typer.Option("--auto-podcast")] = False,
     auto_illustration: Annotated[bool, typer.Option("--auto-illustration")] = False,
 ) -> None:
@@ -59,6 +63,7 @@ def create_section(
         cover=cover,
         labels=normalize_ids(labels),
         auto_publish=auto_publish,
+        access_key=access_key,
         auto_podcast=auto_podcast,
         auto_illustration=auto_illustration,
         process_task_trigger_type=process_task_trigger_type,
@@ -343,6 +348,20 @@ def get_section_publish(
     session = session_from_context(ctx)
     payload = SectionSchema.SectionPublishGetRequest(section_id=section_id)
     handle_api_call(lambda: session.get_section_publish(payload))
+
+
+@app.command("set-publish-access-key")
+def set_section_publish_access_key(
+    ctx: typer.Context,
+    section_id: Annotated[int, typer.Option(..., "--section-id", help="Section id.")],
+    access_key: Annotated[
+        str | None,
+        typer.Option("--access-key", help="Access key to set. Omit or pass blank to clear."),
+    ] = None,
+) -> None:
+    session = session_from_context(ctx)
+    payload = SectionSchema.SectionAccessKeyUpdateRequest(section_id=section_id, access_key=access_key)
+    handle_api_call(lambda: session.update_section_publish_access_key(payload))
 
 
 @app.command("republish")

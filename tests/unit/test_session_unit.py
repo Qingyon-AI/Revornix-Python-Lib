@@ -263,6 +263,98 @@ def test_publish_document_posts_payload_and_returns_success_response():
     assert result.code == 200
 
 
+def test_get_document_publish_parses_access_key_fields():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/document/publish/get": {
+                "status": True,
+                "uuid": "doc-pub-123",
+                "has_access_key": True,
+                "access_key": "open-sesame",
+                "create_time": "2026-06-13T08:00:00",
+                "update_time": None,
+            }
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    result = session.get_document_publish(
+        DocumentSchema.DocumentPublishGetRequest(document_id=7)
+    )
+
+    assert dummy_client.calls == [
+        {
+            "endpoint": "/tp/document/publish/get",
+            "json": {"document_id": 7},
+            "files": None,
+            "data": None,
+        }
+    ]
+    assert result.uuid == "doc-pub-123"
+    assert result.has_access_key is True
+    assert result.access_key == "open-sesame"
+
+
+def test_update_document_publish_access_key_posts_payload():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/document/publish/access-key": {
+                "success": True,
+                "message": "Success",
+                "code": 200,
+            }
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    result = session.update_document_publish_access_key(
+        DocumentSchema.DocumentAccessKeyUpdateRequest(
+            document_id=7,
+            access_key="open-sesame",
+        )
+    )
+
+    assert dummy_client.calls == [
+        {
+            "endpoint": "/tp/document/publish/access-key",
+            "json": {"document_id": 7, "access_key": "open-sesame"},
+            "files": None,
+            "data": None,
+        }
+    ]
+    assert result.success is True
+
+
+def test_update_section_publish_access_key_posts_payload():
+    session = Session(base_url="https://api.example.com", api_key="secret-token")
+    dummy_client = DummyClient(
+        {
+            "/tp/section/publish/access-key": {
+                "success": True,
+                "message": "Success",
+                "code": 200,
+            }
+        }
+    )
+    session.httpx_client = cast(httpx.Client, dummy_client)
+
+    result = session.update_section_publish_access_key(
+        SectionSchema.SectionAccessKeyUpdateRequest(section_id=12, access_key=None)
+    )
+
+    assert dummy_client.calls == [
+        {
+            "endpoint": "/tp/section/publish/access-key",
+            "json": {"section_id": 12},
+            "files": None,
+            "data": None,
+        }
+    ]
+    assert result.success is True
+
+
 def test_get_section_date_posts_payload_and_parses_response():
     session = Session(base_url="https://api.example.com", api_key="secret-token")
     dummy_client = DummyClient(

@@ -45,6 +45,9 @@ def test_create_quick_note_cli_uses_env_and_repeated_ids(monkeypatch):
             "--label",
             "9",
             "--auto-summary",
+            "--auto-publish",
+            "--access-key",
+            "open-sesame",
         ],
         env={
             "REVORNIX_BASE_URL": "https://api.example.com",
@@ -61,6 +64,8 @@ def test_create_quick_note_cli_uses_env_and_repeated_ids(monkeypatch):
     assert DummySession.created_payload.sections == [1, 2]
     assert DummySession.created_payload.labels == [9]
     assert DummySession.created_payload.auto_summary is True
+    assert DummySession.created_payload.auto_publish is True
+    assert DummySession.created_payload.access_key == "open-sesame"
 
 
 def test_create_quick_note_cli_rejects_legacy_env_aliases():
@@ -232,6 +237,42 @@ def test_document_detail_cli_passes_document_id(monkeypatch):
     assert json.loads(result.stdout) == {"id": 7, "title": "Demo"}
     assert DummySession.payload is not None
     assert DummySession.payload.document_id == 7
+
+
+def test_document_detail_cli_passes_uuid_and_access_key(monkeypatch):
+    class DummySession:
+        payload: ClassVar[DocumentSchema.DocumentDetailRequest | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def get_document_detail(self, data):
+            DummySession.payload = data
+            return {"id": 7, "title": "Demo"}
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "documents",
+            "detail",
+            "--uuid",
+            "doc-pub-123",
+            "--access-key",
+            "open-sesame",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert DummySession.payload is not None
+    assert DummySession.payload.uuid == "doc-pub-123"
+    assert DummySession.payload.access_key == "open-sesame"
 
 
 def test_delete_document_cli_passes_repeated_ids(monkeypatch):
@@ -548,6 +589,117 @@ def test_publish_section_cli_passes_status(monkeypatch):
     assert DummySession.payload is not None
     assert DummySession.payload.section_id == 12
     assert DummySession.payload.status is True
+
+
+def test_create_section_cli_passes_publish_access_key(monkeypatch):
+    class DummySession:
+        payload: ClassVar[SectionSchema.SectionCreateRequest | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def create_section(self, data):
+            DummySession.payload = data
+            return SectionSchema.SectionCreateResponse(id=12)
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "sections",
+            "create",
+            "--title",
+            "AI Notes",
+            "--description",
+            "Knowledge base",
+            "--process-task-trigger-type",
+            "1",
+            "--auto-publish",
+            "--access-key",
+            "section-key",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert DummySession.payload is not None
+    assert DummySession.payload.auto_publish is True
+    assert DummySession.payload.access_key == "section-key"
+
+
+def test_document_publish_access_key_cli_passes_payload(monkeypatch):
+    class DummySession:
+        payload: ClassVar[DocumentSchema.DocumentAccessKeyUpdateRequest | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def update_document_publish_access_key(self, data):
+            DummySession.payload = data
+            return CommonSchema.NormalResponse()
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "documents",
+            "set-publish-access-key",
+            "--document-id",
+            "7",
+            "--access-key",
+            "open-sesame",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert DummySession.payload is not None
+    assert DummySession.payload.document_id == 7
+    assert DummySession.payload.access_key == "open-sesame"
+
+
+def test_section_publish_access_key_cli_passes_payload(monkeypatch):
+    class DummySession:
+        payload: ClassVar[SectionSchema.SectionAccessKeyUpdateRequest | None] = None
+
+        def __init__(self, base_url: str, api_key: str):
+            self.base_url = base_url
+            self.api_key = api_key
+
+        def update_section_publish_access_key(self, data):
+            DummySession.payload = data
+            return CommonSchema.NormalResponse()
+
+    monkeypatch.setattr("revornix.cli.shared.Session", DummySession)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--base-url",
+            "https://api.example.com",
+            "--api-key",
+            "secret-token",
+            "sections",
+            "set-publish-access-key",
+            "--section-id",
+            "12",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert DummySession.payload is not None
+    assert DummySession.payload.section_id == 12
+    assert DummySession.payload.access_key is None
 
 
 def test_ask_document_cli_builds_user_message(monkeypatch):

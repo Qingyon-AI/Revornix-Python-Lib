@@ -43,6 +43,11 @@ def create_file_document(
     auto_summary: Annotated[bool, typer.Option("--auto-summary")] = False,
     auto_podcast: Annotated[bool, typer.Option("--auto-podcast")] = False,
     auto_tag: Annotated[bool, typer.Option("--auto-tag")] = False,
+    auto_publish: Annotated[bool, typer.Option("--auto-publish")] = False,
+    access_key: Annotated[
+        str | None,
+        typer.Option("--access-key", help="Optional access key when auto publishing."),
+    ] = None,
 ) -> None:
     session = session_from_context(ctx)
     payload = DocumentSchema.FileDocumentParameters(
@@ -55,6 +60,8 @@ def create_file_document(
         auto_summary=auto_summary,
         auto_podcast=auto_podcast,
         auto_tag=auto_tag,
+        auto_publish=auto_publish,
+        access_key=access_key,
     )
     handle_api_call(lambda: session.create_file_document(payload))
 
@@ -100,6 +107,11 @@ def upload_and_create_file_document(
     auto_summary: Annotated[bool, typer.Option("--auto-summary")] = False,
     auto_podcast: Annotated[bool, typer.Option("--auto-podcast")] = False,
     auto_tag: Annotated[bool, typer.Option("--auto-tag")] = False,
+    auto_publish: Annotated[bool, typer.Option("--auto-publish")] = False,
+    access_key: Annotated[
+        str | None,
+        typer.Option("--access-key", help="Optional access key when auto publishing."),
+    ] = None,
 ) -> None:
     session = session_from_context(ctx)
     handle_api_call(
@@ -117,6 +129,8 @@ def upload_and_create_file_document(
             auto_summary=auto_summary,
             auto_podcast=auto_podcast,
             auto_tag=auto_tag,
+            auto_publish=auto_publish,
+            access_key=access_key,
         )
     )
 
@@ -139,6 +153,11 @@ def create_website_document(
     auto_summary: Annotated[bool, typer.Option("--auto-summary")] = False,
     auto_podcast: Annotated[bool, typer.Option("--auto-podcast")] = False,
     auto_tag: Annotated[bool, typer.Option("--auto-tag")] = False,
+    auto_publish: Annotated[bool, typer.Option("--auto-publish")] = False,
+    access_key: Annotated[
+        str | None,
+        typer.Option("--access-key", help="Optional access key when auto publishing."),
+    ] = None,
 ) -> None:
     session = session_from_context(ctx)
     payload = DocumentSchema.WebsiteDocumentParameters(
@@ -151,6 +170,8 @@ def create_website_document(
         auto_summary=auto_summary,
         auto_podcast=auto_podcast,
         auto_tag=auto_tag,
+        auto_publish=auto_publish,
+        access_key=access_key,
     )
     handle_api_call(lambda: session.create_website_document(payload))
 
@@ -173,6 +194,11 @@ def create_quick_note_document(
     auto_summary: Annotated[bool, typer.Option("--auto-summary")] = False,
     auto_podcast: Annotated[bool, typer.Option("--auto-podcast")] = False,
     auto_tag: Annotated[bool, typer.Option("--auto-tag")] = False,
+    auto_publish: Annotated[bool, typer.Option("--auto-publish")] = False,
+    access_key: Annotated[
+        str | None,
+        typer.Option("--access-key", help="Optional access key when auto publishing."),
+    ] = None,
 ) -> None:
     session = session_from_context(ctx)
     payload = DocumentSchema.QuickNoteDocumentParameters(
@@ -185,6 +211,8 @@ def create_quick_note_document(
         auto_summary=auto_summary,
         auto_podcast=auto_podcast,
         auto_tag=auto_tag,
+        auto_publish=auto_publish,
+        access_key=access_key,
     )
     handle_api_call(lambda: session.create_quick_note_document(payload))
 
@@ -211,6 +239,15 @@ def create_audio_document(
     auto_podcast: Annotated[bool, typer.Option("--auto-podcast")] = False,
     auto_transcribe: Annotated[bool, typer.Option("--auto-transcribe")] = False,
     auto_tag: Annotated[bool, typer.Option("--auto-tag")] = False,
+    auto_publish: Annotated[bool, typer.Option("--auto-publish")] = False,
+    access_key: Annotated[
+        str | None,
+        typer.Option("--access-key", help="Optional access key when auto publishing."),
+    ] = None,
+    audio_meeting_mode: Annotated[
+        bool | None,
+        typer.Option("--audio-meeting-mode/--no-audio-meeting-mode", help="Enable or disable audio meeting mode."),
+    ] = None,
 ) -> None:
     session = session_from_context(ctx)
     payload = DocumentSchema.AudioDocumentParameters(
@@ -224,6 +261,9 @@ def create_audio_document(
         auto_podcast=auto_podcast,
         auto_transcribe=auto_transcribe,
         auto_tag=auto_tag,
+        auto_publish=auto_publish,
+        access_key=access_key,
+        audio_meeting_mode=audio_meeting_mode,
     )
     handle_api_call(lambda: session.create_audio_document(payload))
 
@@ -270,6 +310,15 @@ def upload_and_create_audio_document(
     auto_podcast: Annotated[bool, typer.Option("--auto-podcast")] = False,
     auto_transcribe: Annotated[bool, typer.Option("--auto-transcribe")] = False,
     auto_tag: Annotated[bool, typer.Option("--auto-tag")] = False,
+    auto_publish: Annotated[bool, typer.Option("--auto-publish")] = False,
+    access_key: Annotated[
+        str | None,
+        typer.Option("--access-key", help="Optional access key when auto publishing."),
+    ] = None,
+    audio_meeting_mode: Annotated[
+        bool | None,
+        typer.Option("--audio-meeting-mode/--no-audio-meeting-mode", help="Enable or disable audio meeting mode."),
+    ] = None,
 ) -> None:
     session = session_from_context(ctx)
     handle_api_call(
@@ -288,6 +337,9 @@ def upload_and_create_audio_document(
             auto_podcast=auto_podcast,
             auto_transcribe=auto_transcribe,
             auto_tag=auto_tag,
+            auto_publish=auto_publish,
+            access_key=access_key,
+            audio_meeting_mode=audio_meeting_mode,
         )
     )
 
@@ -296,10 +348,15 @@ def upload_and_create_audio_document(
 def get_document_detail(
     ctx: typer.Context,
     document_id: Annotated[int | None, typer.Option("--document-id", help="Document id.")] = None,
+    uuid: Annotated[str | None, typer.Option("--uuid", help="Published document uuid.")] = None,
     url: Annotated[str | None, typer.Option("--url", help="Website document URL.")] = None,
+    access_key: Annotated[
+        str | None,
+        typer.Option("--access-key", help="Access key for protected published documents."),
+    ] = None,
 ) -> None:
     session = session_from_context(ctx)
-    payload = DocumentSchema.DocumentDetailRequest(document_id=document_id, url=url)
+    payload = DocumentSchema.DocumentDetailRequest(document_id=document_id, uuid=uuid, url=url, access_key=access_key)
     handle_api_call(lambda: session.get_document_detail(payload))
 
 
@@ -387,6 +444,20 @@ def get_document_publish(
     session = session_from_context(ctx)
     payload = DocumentSchema.DocumentPublishGetRequest(document_id=document_id)
     handle_api_call(lambda: session.get_document_publish(payload))
+
+
+@app.command("set-publish-access-key")
+def set_document_publish_access_key(
+    ctx: typer.Context,
+    document_id: Annotated[int, typer.Option(..., "--document-id", help="Document id.")],
+    access_key: Annotated[
+        str | None,
+        typer.Option("--access-key", help="Access key to set. Omit or pass blank to clear."),
+    ] = None,
+) -> None:
+    session = session_from_context(ctx)
+    payload = DocumentSchema.DocumentAccessKeyUpdateRequest(document_id=document_id, access_key=access_key)
+    handle_api_call(lambda: session.update_document_publish_access_key(payload))
 
 
 def _search_request(

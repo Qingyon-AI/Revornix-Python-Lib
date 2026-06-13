@@ -32,6 +32,8 @@ def upload_and_create_file_document(
     auto_summary: bool,
     auto_podcast: bool,
     auto_tag: bool,
+    auto_publish: bool,
+    access_key: str | None,
 ) -> dict[str, Any]:
     normalized_remote_file_path = normalize_remote_file_path(local_file_path, remote_file_path)
     normalized_content_type = guess_content_type(local_file_path, content_type)
@@ -51,6 +53,8 @@ def upload_and_create_file_document(
             auto_summary=auto_summary,
             auto_podcast=auto_podcast,
             auto_tag=auto_tag,
+            auto_publish=auto_publish,
+            access_key=access_key,
         )
     )
     return {"upload": upload_result, "document": document_result}
@@ -72,6 +76,9 @@ def upload_and_create_audio_document(
     auto_podcast: bool,
     auto_transcribe: bool,
     auto_tag: bool,
+    auto_publish: bool,
+    access_key: str | None,
+    audio_meeting_mode: bool | None,
 ) -> dict[str, Any]:
     normalized_remote_file_path = normalize_remote_file_path(local_file_path, remote_file_path)
     normalized_content_type = guess_content_type(local_file_path, content_type)
@@ -92,6 +99,9 @@ def upload_and_create_audio_document(
             auto_podcast=auto_podcast,
             auto_transcribe=auto_transcribe,
             auto_tag=auto_tag,
+            auto_publish=auto_publish,
+            access_key=access_key,
+            audio_meeting_mode=audio_meeting_mode,
         )
     )
     return {"upload": upload_result, "document": document_result}

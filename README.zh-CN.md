@@ -90,7 +90,9 @@ revornix documents create-quick-note \
   --section 1 \
   --section 2 \
   --label 10 \
-  --auto-summary
+  --auto-summary \
+  --auto-publish \
+  --access-key open-sesame
 ```
 
 创建网页文档：
@@ -440,6 +442,14 @@ revornix sections publish --section-id 12 --status true
 revornix sections publish --section-id 12 --status false
 ```
 
+设置或清除发布访问密钥：
+
+```shell
+revornix documents set-publish-access-key --document-id 123 --access-key open-sesame
+revornix sections set-publish-access-key --section-id 12 --access-key section-key
+revornix sections set-publish-access-key --section-id 12
+```
+
 重新发布：
 
 ```shell
@@ -758,6 +768,9 @@ res = session.delete_section(data=data)
 - `update_document`
 - `transform_document_markdown`
 - `delete_document`
+- `publish_document`
+- `get_document_publish`
+- `update_document_publish_access_key`
 - `search_mine_documents`
 - `search_unread_documents`
 - `search_recent_documents`
@@ -785,6 +798,7 @@ res = session.delete_section(data=data)
 - `retry_section_document`
 - `publish_section`
 - `get_section_publish`
+- `update_section_publish_access_key`
 - `republish_section`
 - `search_graph`
 - `search_document_graph`

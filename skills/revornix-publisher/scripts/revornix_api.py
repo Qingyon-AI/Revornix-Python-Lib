@@ -32,6 +32,7 @@ SEARCH_RECENT_DOCUMENTS_ENDPOINT = "/tp/document/recent/search"
 UPDATE_DOCUMENT_ENDPOINT = "/tp/document/update"
 PUBLISH_DOCUMENT_ENDPOINT = "/tp/document/publish"
 GET_DOCUMENT_PUBLISH_ENDPOINT = "/tp/document/publish/get"
+UPDATE_DOCUMENT_PUBLISH_ACCESS_KEY_ENDPOINT = "/tp/document/publish/access-key"
 TRANSFORM_DOCUMENT_MARKDOWN_ENDPOINT = "/tp/document/markdown/transform"
 DELETE_DOCUMENT_ENDPOINT = "/tp/document/delete"
 SEARCH_STAR_DOCUMENTS_ENDPOINT = "/tp/document/star/search"
@@ -64,6 +65,7 @@ RETRY_SECTION_DOCUMENT_ENDPOINT = "/tp/section/document/retry"
 SEARCH_MINE_SECTIONS_ENDPOINT = "/tp/section/mine/search"
 PUBLISH_SECTION_ENDPOINT = "/tp/section/publish"
 GET_SECTION_PUBLISH_ENDPOINT = "/tp/section/publish/get"
+UPDATE_SECTION_PUBLISH_ACCESS_KEY_ENDPOINT = "/tp/section/publish/access-key"
 REPUBLISH_SECTION_ENDPOINT = "/tp/section/republish"
 
 SEARCH_GRAPH_ENDPOINT = "/tp/graph/search"
@@ -107,6 +109,7 @@ def parse_args() -> argparse.Namespace:
     create_section_parser.add_argument("--cover", default=None)
     create_section_parser.add_argument("--label", action="append", type=int, default=[])
     create_section_parser.add_argument("--auto-publish", action="store_true")
+    create_section_parser.add_argument("--access-key", default=None)
     create_section_parser.add_argument("--auto-podcast", action="store_true")
     create_section_parser.add_argument("--auto-illustration", action="store_true")
     create_section_parser.add_argument("--process-task-trigger-type", type=int, default=1)
@@ -194,6 +197,13 @@ def parse_args() -> argparse.Namespace:
     )
     get_section_publish_parser.add_argument("--section-id", required=True, type=int)
 
+    section_access_key_parser = subparsers.add_parser(
+        "set-section-publish-access-key",
+        help="Set or clear a section publish access key.",
+    )
+    section_access_key_parser.add_argument("--section-id", required=True, type=int)
+    section_access_key_parser.add_argument("--access-key", default=None)
+
     republish_section_parser = subparsers.add_parser("republish-section", help="Republish a section.")
     republish_section_parser.add_argument("--section-id", required=True, type=int)
 
@@ -254,10 +264,13 @@ def parse_args() -> argparse.Namespace:
     add_document_common_args(create_audio_parser)
     create_audio_parser.add_argument("--file-name", required=True)
     create_audio_parser.add_argument("--auto-transcribe", action="store_true")
+    create_audio_parser.add_argument("--audio-meeting-mode", type=parse_bool, default=None)
 
     document_detail_parser = subparsers.add_parser("document-detail", help="Get document detail.")
     document_detail_parser.add_argument("--document-id", type=int, default=None)
+    document_detail_parser.add_argument("--uuid", default=None)
     document_detail_parser.add_argument("--url", default=None)
+    document_detail_parser.add_argument("--access-key", default=None)
 
     ask_document_parser = subparsers.add_parser("ask-document", help="Ask document AI.")
     ask_document_parser.add_argument("--document-id", required=True, type=int)
@@ -285,6 +298,13 @@ def parse_args() -> argparse.Namespace:
 
     get_document_publish_parser = subparsers.add_parser("get-document-publish", help="Get document publish status.")
     get_document_publish_parser.add_argument("--document-id", required=True, type=int)
+
+    document_access_key_parser = subparsers.add_parser(
+        "set-document-publish-access-key",
+        help="Set or clear a document publish access key.",
+    )
+    document_access_key_parser.add_argument("--document-id", required=True, type=int)
+    document_access_key_parser.add_argument("--access-key", default=None)
 
     search_mine_documents_parser = subparsers.add_parser(
         "search-mine-documents",
@@ -392,6 +412,7 @@ def parse_args() -> argparse.Namespace:
     )
     add_upload_and_document_args(upload_and_create_audio_parser)
     upload_and_create_audio_parser.add_argument("--auto-transcribe", action="store_true")
+    upload_and_create_audio_parser.add_argument("--audio-meeting-mode", type=parse_bool, default=None)
 
     return parser.parse_args()
 
@@ -405,6 +426,8 @@ def add_document_common_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--auto-summary", action="store_true")
     parser.add_argument("--auto-podcast", action="store_true")
     parser.add_argument("--auto-tag", action="store_true")
+    parser.add_argument("--auto-publish", action="store_true")
+    parser.add_argument("--access-key", default=None)
 
 
 def add_search_args(parser: argparse.ArgumentParser) -> None:
@@ -552,6 +575,8 @@ def build_document_payload(args: argparse.Namespace, category: int) -> dict:
         "auto_summary": args.auto_summary,
         "auto_podcast": args.auto_podcast,
         "auto_tag": args.auto_tag,
+        "auto_publish": args.auto_publish,
+        "access_key": args.access_key,
         "category": category,
         "from_plat": "openclaw skill",
     }
@@ -609,13 +634,20 @@ def create_audio_document(base_url: str, api_key: str, args: argparse.Namespace)
     payload = build_document_payload(args, category=3)
     payload["file_name"] = args.file_name
     payload["auto_transcribe"] = args.auto_transcribe
+    payload["audio_meeting_mode"] = args.audio_meeting_mode
+    payload = {key: value for key, value in payload.items() if value is not None}
     return post_json(base_url, api_key, CREATE_DOCUMENT_ENDPOINT, payload)
 
 
 def get_document_detail(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
-    if args.document_id is None and not args.url:
-        raise SystemExit("Either --document-id or --url is required.")
-    payload = {"document_id": args.document_id, "url": args.url}
+    if args.document_id is None and not args.uuid and not args.url:
+        raise SystemExit("Either --document-id, --uuid, or --url is required.")
+    payload = {
+        "document_id": args.document_id,
+        "uuid": args.uuid,
+        "url": args.url,
+        "access_key": args.access_key,
+    }
     payload = {key: value for key, value in payload.items() if value is not None}
     return post_json(base_url, api_key, DOCUMENT_DETAIL_ENDPOINT, payload)
 
@@ -664,6 +696,12 @@ def get_document_publish(base_url: str, api_key: str, args: argparse.Namespace) 
         GET_DOCUMENT_PUBLISH_ENDPOINT,
         {"document_id": args.document_id},
     )
+
+
+def set_document_publish_access_key(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    payload = {"document_id": args.document_id, "access_key": args.access_key}
+    payload = {key: value for key, value in payload.items() if value is not None}
+    return post_json(base_url, api_key, UPDATE_DOCUMENT_PUBLISH_ACCESS_KEY_ENDPOINT, payload)
 
 
 def search_mine_documents(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
@@ -767,6 +805,7 @@ def create_section(base_url: str, api_key: str, args: argparse.Namespace) -> dic
         "cover": args.cover,
         "labels": args.label,
         "auto_publish": args.auto_publish,
+        "access_key": args.access_key,
         "auto_podcast": args.auto_podcast,
         "auto_illustration": args.auto_illustration,
         "process_task_trigger_type": args.process_task_trigger_type,
@@ -918,6 +957,12 @@ def get_section_publish(base_url: str, api_key: str, args: argparse.Namespace) -
     )
 
 
+def set_section_publish_access_key(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
+    payload = {"section_id": args.section_id, "access_key": args.access_key}
+    payload = {key: value for key, value in payload.items() if value is not None}
+    return post_json(base_url, api_key, UPDATE_SECTION_PUBLISH_ACCESS_KEY_ENDPOINT, payload)
+
+
 def republish_section(base_url: str, api_key: str, args: argparse.Namespace) -> dict:
     return post_json(
         base_url,
@@ -997,6 +1042,8 @@ def main() -> None:
         result = publish_section(base_url, api_key, args)
     elif args.command == "get-section-publish":
         result = get_section_publish(base_url, api_key, args)
+    elif args.command == "set-section-publish-access-key":
+        result = set_section_publish_access_key(base_url, api_key, args)
     elif args.command == "republish-section":
         result = republish_section(base_url, api_key, args)
     elif args.command == "create-document-label":
@@ -1029,6 +1076,8 @@ def main() -> None:
         result = document_publish(base_url, api_key, args)
     elif args.command == "get-document-publish":
         result = get_document_publish(base_url, api_key, args)
+    elif args.command == "set-document-publish-access-key":
+        result = set_document_publish_access_key(base_url, api_key, args)
     elif args.command == "search-mine-documents":
         result = search_mine_documents(base_url, api_key, args)
     elif args.command == "search-unread-documents":

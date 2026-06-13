@@ -23,4 +23,5 @@ class SectionApi:
     search_mine_sections = "/tp/section/mine/search"
     publish_section = "/tp/section/publish"
     get_section_publish = "/tp/section/publish/get"
+    update_section_publish_access_key = "/tp/section/publish/access-key"
     republish_section = "/tp/section/republish"

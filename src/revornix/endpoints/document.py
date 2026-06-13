@@ -19,6 +19,7 @@ class DocumentApi:
     update_document = "/tp/document/update"
     publish_document = "/tp/document/publish"
     get_document_publish = "/tp/document/publish/get"
+    update_document_publish_access_key = "/tp/document/publish/access-key"
     transform_markdown = "/tp/document/markdown/transform"
     delete_document = "/tp/document/delete"
     search_star_documents = "/tp/document/star/search"
